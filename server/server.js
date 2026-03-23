@@ -1,9 +1,12 @@
 const express = require("express"); // importing express module
 const app = express(); // creating express app
 
-//imorting dotenv
-require('dotenv').config();
+//dotenv config import before db connection
+require("dotenv").config();
 const PORT = process.env.PORT || 3000;
+
+//help to connect database directly as connection function already called inside it
+require("./config/db.config");
 
 // parse requests of content-type = application/json
 app.use(express.json());
