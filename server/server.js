@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
     res.status(200).json({message: 'JetStock backend is running'})
 })
 
-//server is litening port
+//server is listening port
 app.listen(PORT, () => {
     console.log(`App is listening on http:localhost: ${PORT}`);
 })
