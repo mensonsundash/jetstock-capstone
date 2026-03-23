@@ -1,7 +1,9 @@
 const express = require("express"); // importing express module
 const app = express(); // creating express app
 
-const PORT = 3000;
+//imorting dotenv
+require('dotenv').config();
+const PORT = process.env.PORT || 3000;
 
 // parse requests of content-type = application/json
 app.use(express.json());
