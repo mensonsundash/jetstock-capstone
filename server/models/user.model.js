@@ -4,7 +4,7 @@ const { DataTypes } = require("sequelize");
 const { Sequelize } = require("../config/db.config");
 
 // mysql schema generator to create table
-const User = Sequelize.define('user', {
+const User = Sequelize.define('User', {
     
     id: {
       type: DataTypes.INTEGER,

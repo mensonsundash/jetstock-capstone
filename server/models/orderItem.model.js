@@ -1,8 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 
-// mysql schema generator to create table
-const Inventory = sequelize.define( "Inventory",
+const OrderItem = sequelize.define("OrderItem",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -10,31 +9,33 @@ const Inventory = sequelize.define( "Inventory",
       autoIncrement: true,
       allowNull: false,
     },
+    order_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     product_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      unique: true,
     },
-    quantity_on_hand: {
+    quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 0,
     },
-    reorder_level: {
-      type: DataTypes.INTEGER,
+    unit_price: {
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
-      defaultValue: 5,
     },
-    location: {
-      type: DataTypes.STRING(120),
-      allowNull: true,
+    sub_total: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
     },
   },
   {
-    tableName: "inventory",
-    timestamps: false,
-    updatedAt: "updated_at",
+    tableName: "order_items",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: false,
   }
 );
 
-module.exports = Inventory;
+module.exports = OrderItem;

@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/db.config");
 
-const StockMovement = sequelize.define( "stockMovement",
+const StockMovement = sequelize.define( "StockMovement",
   {
     id: {
       type: DataTypes.INTEGER,
