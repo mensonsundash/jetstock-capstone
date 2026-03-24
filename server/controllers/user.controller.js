@@ -37,7 +37,7 @@ const getUserById = async (req, res) => {
 }
 
 /**
- * Function to get all users list
+ * Function to create a user
  */
 const createUser = async (req, res) => {
     try{
@@ -78,7 +78,7 @@ const createUser = async (req, res) => {
     }
 }
 /**
- * Function to get all users list
+ * Function to update user by its id
  */
 const updateUser = async (req, res) => {
     try{
@@ -115,7 +115,7 @@ const updateUser = async (req, res) => {
 }
 
 /**
- * Function to get all users list
+ * Function to get delete user by its id
  */
 const deleteUser = async (req, res) => {
     try{

@@ -30,5 +30,6 @@ module.exports = {
     Supplier,
     Category,
     Product,
+    Inventory,
     StockMovement
 }

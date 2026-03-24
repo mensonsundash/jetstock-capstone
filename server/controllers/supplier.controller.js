@@ -37,7 +37,7 @@ const getSupplierById = async (req, res) => {
 }
 
 /**
- * Function to get all suppliers list
+ * Function to create a supplier
  */
 const createSupplier = async (req, res) => {
     try{
@@ -76,7 +76,7 @@ const createSupplier = async (req, res) => {
     }
 }
 /**
- * Function to get all suppliers list
+ * Function to update supplier by its id
  */
 const updateSupplier = async (req, res) => {
     try{
@@ -113,7 +113,7 @@ const updateSupplier = async (req, res) => {
 }
 
 /**
- * Function to get all suppliers list
+ * Function to delete supplier by its id
  */
 const deleteSupplier = async (req, res) => {
     try{
