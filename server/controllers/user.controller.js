@@ -46,7 +46,7 @@ const createUser = async (req, res) => {
 
         if(!first_name || !last_name || !email  || !password || !business_name || !phone || !address || !role) {
             //Code 400: Bad Request -> missing/invalid body
-            return res.status(400).json({ message: 'first_name, last_name, email, password, business_name, phone, address, role is required'})
+            return res.status(400).json({ message: 'All user fields are required'})
         }
 
         // checking email already exist as email should be unique
