@@ -1,8 +1,10 @@
+'use strict';
+
 const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db.config");
+const { Sequelize } = require("../config/db.config");
 
 // mysql schema generator to create table
-const Inventory = sequelize.define( "Inventory",
+const Inventory = Sequelize.define( "Inventory",
   {
     id: {
       type: DataTypes.INTEGER,

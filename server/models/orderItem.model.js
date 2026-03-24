@@ -1,7 +1,9 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db.config");
+'use strict';
 
-const OrderItem = sequelize.define("OrderItem",
+const { DataTypes } = require("sequelize");
+const { Sequelize } = require("../config/db.config");
+
+const OrderItem = Sequelize.define("OrderItem",
   {
     id: {
       type: DataTypes.INTEGER,
