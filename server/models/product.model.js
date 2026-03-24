@@ -11,11 +11,11 @@ const Product = Sequelize.define( "product",
       autoIncrement: true,
       allowNull: false,
     },
-    supplier_id: {
+    user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    user_id: {
+    supplier_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
