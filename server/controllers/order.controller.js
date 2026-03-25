@@ -22,7 +22,7 @@ const getAllOrders = async (req, res) => {
         res.status(200).json({ message: 'Order fetched successfully', data: orders })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch order', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch order', error: error.message })
     }
 }
 
@@ -50,7 +50,7 @@ const getOrderById = async (req, res) => {
         res.status(200).json({ message: 'Order fetched successfully', data: order })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch order', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch order', error: error.message })
     }
 }
 
@@ -65,11 +65,10 @@ const createOrder = async (req, res) => {
         // destructure data from requested body value
         const { user_id, customer_id, order_date, status, items } = req.body;
 
-        if(!user_id || !customer_id || !items  ) {
-            if(!Array.isArray(items) || items.length === 0){
+        if(!user_id || !customer_id || !items  || !Array.isArray(items) || items.length === 0){
                 //Code 400: Bad Request -> missing/invalid body
                 return res.status(400).json({ message: 'All order fields are required'})
-            }
+            
         }
 
         let total_amount = 0;// intialize total_amount = 0
@@ -80,29 +79,31 @@ const createOrder = async (req, res) => {
 
             const product = await Models.Product.findByPk(item.product_id, { transaction });
             
-            // check if product exists
+            // check if each product exists
             if(!product) {
                 await transaction.rollback();
 
                 return res.status(404).json({message: `Product not found: ${item.product_id}`});
             }
 
-            //get stock record for the product
+            //get stock record for each product from inventory
             const inventory = await Models.Inventory.findOne({
                 where: { product_id: item.product_id },
                 transaction
             });
 
-            // check stock availability
+            // check stock availability to prevent selling more item than stocked items
             if(!inventory || inventory.quantity_on_hand < item.quantity) {
                 await transaction.rollback();
                 return res.status(400).json({message: `Insufficient stock for the product ${ item.product_id }`})
             }
 
+            // calculating total price against quantities of all items
             total_amount += Number(product.price) * Number(item.quantity);
 
         }
 
+        // Parent: order record creation
         const order = await Models.Order.create({
                 user_id,
                 customer_id,
@@ -119,6 +120,7 @@ const createOrder = async (req, res) => {
                 const product = await Models.Product.findByPk(item.product_id, { transaction });
                 const sub_total = Number(product.price) * Number(item.quantity);
 
+                // orderItems record creation
                 const orderItem = await Models.OrderItem.create(
                     {
                         order_id: order.id,
@@ -136,8 +138,9 @@ const createOrder = async (req, res) => {
                 });
 
                 inventory.quantity_on_hand -= Number(item.quantity);
-                await inventory.save({ transaction });
+                await inventory.save({ transaction }); // updating inventory data
 
+                // stockmovement record creation
                 await Models.StockMovement.create({
                         product_id: item.product_id,
                         user_id,
@@ -152,6 +155,8 @@ const createOrder = async (req, res) => {
                 );
             }
 
+            // at end commiting all affect and finalizing that 
+            // order, orderItems, inventory update, and stock movement all succeed together
             await transaction.commit();
 
             //Success Response Code 201: Created -> POST create
@@ -159,8 +164,10 @@ const createOrder = async (req, res) => {
         }
     
     } catch(error) {
+        //partial transaction state resolved
+        await transaction.rollback();
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to create order', error: error.message })
+        res.status(500).json({ message: 'Failed to create order', error: error.message })
     }
 }
 /**
@@ -187,7 +194,7 @@ const updateOrderStatus = async (req, res) => {
         res.status(200).json({ message: 'Order status updated successfully', data: updatedOrder })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update order status', error: error.message })
+        res.status(500).json({ message: 'Failed to update order status', error: error.message })
     }
 }
 
@@ -208,7 +215,7 @@ const deleteOrder = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to delete order', error: error.message })
+        res.status(500).json({ message: 'Failed to delete order', error: error.message })
     }
 }
 
