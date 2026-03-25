@@ -85,7 +85,7 @@ const getStockMovementsByProductId = async (req, res) => {
 const createStockMovement = async (req, res) => {
     try{
 
-        const stockMovement = await Models.stockMovement.create(req.body);
+        const stockMovement = await Models.StockMovement.create(req.body);
         
         //checking if stockMovement not exist and stop : Code 404: Not Found
         if(!stockMovement) return res.status(400).json({ message: "Stock movements not created"})

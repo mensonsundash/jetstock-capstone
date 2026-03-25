@@ -10,16 +10,17 @@ const User = require("./user.model");
 
 // function to initialize each models
 async function init() {
-    //synchronize the models
+    //synchronize the models: and arrange orders acording to dependability
     await User.sync(); 
     await Supplier.sync(); 
     await Category.sync();
     await Product.sync();
-    await Inventory.sync();
-    await StockMovement.sync();
     await Customer.sync();
     await Order.sync();
     await OrderItem.sync();
+    await Inventory.sync();
+    await StockMovement.sync();
+    
 }
 
 //calling initialization function to load all models
@@ -88,7 +89,7 @@ init();
 /**OrderItem relationships**/
     // OrderItem -> StockMovement: One to Many relationship
     OrderItem.hasMany(StockMovement, { foreignKey: "order_item_id", as: "stock_movements" });
-    StockMovement.belongsTo(OrderItem, { foreignKey: "order_item_id", as: "order_item" });
+    StockMovement.belongsTo(OrderItem, { foreignKey: "order_item_id", as: "order_items" });
 
 module.exports = {
     User,

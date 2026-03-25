@@ -11,7 +11,7 @@ const getAllUsers = async (req, res) => {
         res.status(200).json({ message: 'User fetched successfully', data: users })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch user', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch user', error: error.message })
     }
 }
 
@@ -32,7 +32,7 @@ const getUserById = async (req, res) => {
         res.status(200).json({ message: 'User fetched successfully', data: user })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch user', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch user', error: error.message })
     }
 }
 
@@ -44,16 +44,17 @@ const createUser = async (req, res) => {
         // destructure data from requested body value
         const { first_name, last_name, email, password, business_name, phone, address, role } = req.body;
 
-        if(!first_name || !last_name || !email  || !password || !business_name || !phone || !address || !role) {
+        if(!first_name || !last_name || !email  || !password || !business_name ) {
             //Code 400: Bad Request -> missing/invalid body
             return res.status(400).json({ message: 'All user fields are required'})
         }
-
+        
         // checking email already exist as email should be unique
-        const existingUser = await User.findOne({
+        const existingUser = await Models.User.findOne({
             where: { email }
         });
 
+        console.log(existingUser)
         if(existingUser) {
             //Code 409: Conflict -> duplication
             return res.status(409).json({ message: 'User with this email already exists'})
@@ -74,7 +75,7 @@ const createUser = async (req, res) => {
 
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to create user', error: error.message })
+        res.status(500).json({ message: 'Failed to create user', error: error.message })
     }
 }
 /**
@@ -110,7 +111,7 @@ const updateUser = async (req, res) => {
         res.status(200).json({ message: 'User updated successfully', data: updatedUser })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update user', error: error.message })
+        res.status(500).json({ message: 'Failed to update user', error: error.message })
     }
 }
 
@@ -131,7 +132,7 @@ const deleteUser = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to delete user', error: error.message })
+        res.status(500).json({ message: 'Failed to delete user', error: error.message })
     }
 }
 

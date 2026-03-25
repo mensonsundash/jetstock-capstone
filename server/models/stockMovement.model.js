@@ -48,6 +48,7 @@ const StockMovement = Sequelize.define( "StockMovement",
   {
     tableName: "stock_movements",
     timestamps: true,
+    underscored: true,
     createdAt: "created_at",
     updatedAt: false,
   }

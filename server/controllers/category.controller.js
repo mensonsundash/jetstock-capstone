@@ -50,7 +50,7 @@ const createCategory = async (req, res) => {
         }
 
         // checking category name already exist for the loggedin user: name may exist in another user too
-        const existingCategory = await Category.findOne({
+        const existingCategory = await Models.Category.findOne({
             where: { user_id, name }
         });
 

@@ -11,7 +11,7 @@ const getAllSuppliers = async (req, res) => {
         res.status(200).json({ message: 'Supplier fetched successfully', data: suppliers })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch supplier', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch supplier', error: error.message })
     }
 }
 
@@ -32,7 +32,7 @@ const getSupplierById = async (req, res) => {
         res.status(200).json({ message: 'Supplier fetched successfully', data: supplier })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch supplier', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch supplier', error: error.message })
     }
 }
 
@@ -50,7 +50,7 @@ const createSupplier = async (req, res) => {
         }
 
         // checking email already exist for the loggedin user: email may exist in another user too
-        const existingSupplier = await Supplier.findOne({
+        const existingSupplier = await Models.Supplier.findOne({
             where: { user_id, email }
         });
 
@@ -72,7 +72,7 @@ const createSupplier = async (req, res) => {
 
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to create supplier', error: error.message })
+        res.status(500).json({ message: 'Failed to create supplier', error: error.message })
     }
 }
 /**
@@ -108,7 +108,7 @@ const updateSupplier = async (req, res) => {
         res.status(200).json({ message: 'Supplier updated successfully', data: updatedSupplier })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update supplier', error: error.message })
+        res.status(500).json({ message: 'Failed to update supplier', error: error.message })
     }
 }
 
@@ -129,7 +129,7 @@ const deleteSupplier = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to delete supplier', error: error.message })
+        res.status(500).json({ message: 'Failed to delete supplier', error: error.message })
     }
 }
 

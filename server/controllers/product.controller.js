@@ -71,7 +71,7 @@ const createProduct = async (req, res) => {
         }
 
         // checking email already exist for the loggedin user: email may exist in another user too
-        const existingProduct = await Product.findOne({
+        const existingProduct = await Models.Product.findOne({
             where: { user_id, sku }
         });
 
