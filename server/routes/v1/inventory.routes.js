@@ -18,11 +18,12 @@ const authorizeRoles = require("../../middlewares/role.middleware"); // importin
 //CRUD routers connecting its controllers
 // Protected: loggedin user and admin can get/post/put/delete operations
 app.get("/", authenticate, authorizeRoles("admin", "user"), getAllInventory);
-app.get("/:id", authenticate, authorizeRoles("admin", "user"), getInventoryById);
 app.get("/product/:productId", authenticate, authorizeRoles("admin", "user"), getInventoryByProductId);
 app.get("/summary", authenticate, authorizeRoles("admin", "user"), getInventorySummary);
 app.get("/low-stock", authenticate, authorizeRoles("admin", "user"), getLowStockItems);
 app.get("/out-of-stock", authenticate, authorizeRoles("admin", "user"), getOutOfStockItems);
 app.put("/product/:productId", authenticate, authorizeRoles("admin", "user"), updateInventory);
+//specific routes first, then id last
+app.get("/:id", authenticate, authorizeRoles("admin", "user"), getInventoryById);
 
 module.exports = app;

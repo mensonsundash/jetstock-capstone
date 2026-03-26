@@ -17,7 +17,7 @@ const getAllInventory = async (req, res) => {
         res.status(200).json({ message: 'Inventory fetched successfully', data: inventory })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch inventory', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch inventory', error: error.message })
     }
 }
 
@@ -32,9 +32,7 @@ const getInventoryById = async (req, res) => {
         // fetching inventory table and joining related table with alias as: product
         const inventory = await Models.Inventory.findByPk(inventoryId,{
             include:[
-                { model: Models.Supplier, as: "supplier" },
-                { model: Models.Category, as: "category" },
-                { model: Models.Inventory, as: "inventory" },
+                { model: Models.Product, as: "product" },
             ]
         }); // using sequelize find by primary key with include feature to join another tables
 
@@ -45,7 +43,7 @@ const getInventoryById = async (req, res) => {
         res.status(200).json({ message: 'Inventory fetched successfully', data: inventory })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch inventory', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch inventory', error: error.message })
     }
 }
 
@@ -73,7 +71,7 @@ const getInventoryByProductId = async (req, res) => {
         res.status(200).json({ message: 'Inventory fetched successfully', data: inventory })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch inventory', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch inventory', error: error.message })
     }
 }
 
@@ -98,7 +96,7 @@ const getLowStockItems = async (req, res) => {
         res.status(200).json({ message: 'Inventory fetched with lock stock items', data: inventories })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch low stock items', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch low stock items', error: error.message })
     }
 }
 
@@ -123,7 +121,7 @@ const getOutOfStockItems = async (req, res) => {
         res.status(200).json({ message: 'Inventory fetched with out of stock items', data: inventories })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch out of stock items', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch out of stock items', error: error.message })
     }
 }
 
@@ -154,7 +152,7 @@ const getInventorySummary = async (req, res) => {
         }})
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch out of stock items', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch out of stock items', error: error.message })
     }
 }
 
@@ -192,7 +190,7 @@ const updateInventory = async (req, res) => {
         res.status(200).json({ message: 'Inventory updated successfully', data: updatedInventory })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update inventory', error: error.message })
+        res.status(500).json({ message: 'Failed to update inventory', error: error.message })
     }
 }
 

@@ -15,8 +15,9 @@ const authorizeRoles = require("../../middlewares/role.middleware"); // importin
 //CRUD routers connecting its controllers
 // Protected: loggedin user and admin can get/post/put/delete operations
 app.get("/", authenticate, authorizeRoles("admin", "user"), getAllStockMovements);
-app.get("/:id", authenticate, authorizeRoles("admin", "user"), getStockMovementById);
 app.get("/product/:productId", authenticate, authorizeRoles("admin", "user"), getStockMovementsByProductId);
+//specific routes first and then id last
+app.get("/:id", authenticate, authorizeRoles("admin", "user"), getStockMovementById);
 app.post("/", authenticate, authorizeRoles("admin", "user"), createStockMovement);
 app.post("/stock-in", authenticate, authorizeRoles("admin", "user"), stockInProduct);
 app.post("/stock-out", authenticate, authorizeRoles("admin", "user"), stockOutProduct);

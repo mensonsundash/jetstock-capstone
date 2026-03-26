@@ -11,7 +11,7 @@ const getAllCustomers = async (req, res) => {
         res.status(200).json({ message: 'Customer fetched successfully', data: customers })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch customer', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch customer', error: error.message })
     }
 }
 
@@ -32,7 +32,7 @@ const getCustomerById = async (req, res) => {
         res.status(200).json({ message: 'Customer fetched successfully', data: customer })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch customer', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch customer', error: error.message })
     }
 }
 
@@ -53,7 +53,7 @@ const createCustomer = async (req, res) => {
         if(email) {
             const existingCustomer = await Models.Customer.findOne({ where: {user_id, email} });
             //strict check: if the same current customer already has that email -> allow it
-            if(existingCustomer && existingCustomer.id !== Number(id)) {
+            if(existingCustomer) {
                 //Code 409: Conflict -> duplication
                 return res.status(409).json({ message: 'Customer with this email already exists', data: existingCustomer})
             }
@@ -71,7 +71,7 @@ const createCustomer = async (req, res) => {
 
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to create customer', error: error.message })
+        res.status(500).json({ message: 'Failed to create customer', error: error.message })
     }
 }
 /**
@@ -107,7 +107,7 @@ const updateCustomer = async (req, res) => {
         res.status(200).json({ message: 'Customer updated successfully', data: updatedCustomer })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update customer', error: error.message })
+        res.status(500).json({ message: 'Failed to update customer', error: error.message })
     }
 }
 
@@ -128,7 +128,7 @@ const deleteCustomer = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to delete customer', error: error.message })
+        res.status(500).json({ message: 'Failed to delete customer', error: error.message })
     }
 }
 

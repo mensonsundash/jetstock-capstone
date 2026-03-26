@@ -19,7 +19,7 @@ const getAllStockMovements = async (req, res) => {
         res.status(200).json({ message: 'Stock movement fetched successfully', data: stockMovements })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch stock movement', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch stock movement', error: error.message })
     }
 }
 
@@ -45,7 +45,7 @@ const getStockMovementById = async (req, res) => {
         res.status(200).json({ message: 'Stock movement fetched successfully', data: stockMovement })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch stock movement', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch stock movement', error: error.message })
     }
 }
 
@@ -74,7 +74,7 @@ const getStockMovementsByProductId = async (req, res) => {
         res.status(200).json({ message: 'Stock movements fetched successfully', data: stockMovements })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch stock movements', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch stock movements', error: error.message })
     }
 }
 
@@ -94,7 +94,7 @@ const createStockMovement = async (req, res) => {
         res.status(201).json({ message: 'Stock movements recorded successfully', data: stockMovement })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to record stock movements', error: error.message })
+        res.status(500).json({ message: 'Failed to record stock movements', error: error.message })
     }
 }
 
@@ -135,7 +135,7 @@ const stockInProduct = async (req, res) => {
         res.status(201).json({ message: 'Stock added successfully', data: stockMovement })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to stock in product', error: error.message })
+        res.status(500).json({ message: 'Failed to stock in product', error: error.message })
     }
 }
 
@@ -179,7 +179,7 @@ const stockOutProduct = async (req, res) => {
         res.status(201).json({ message: 'Stock removed successfully', data: stockMovement })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to stock out product', error: error.message })
+        res.status(500).json({ message: 'Failed to stock out product', error: error.message })
     }
 }
 

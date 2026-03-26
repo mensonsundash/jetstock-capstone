@@ -18,7 +18,7 @@ const authorizeRoles = (...allowedRoles) => {
             next(); // if user has correct role and pass this perimeter then continue request to next
 
         } catch(error) {
-            return res.status(500).json({message: 'Authorization failed', error: error.message});
+            return res.status(401).json({message: 'Authorization failed', error: error.message});
         }
 
         

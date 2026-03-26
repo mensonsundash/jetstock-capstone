@@ -11,7 +11,7 @@ const getAllCategories = async (req, res) => {
         res.status(200).json({ message: 'Category fetched successfully', data: categories })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch category', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch category', error: error.message })
     }
 }
 
@@ -32,7 +32,7 @@ const getCategoryById = async (req, res) => {
         res.status(200).json({ message: 'Category fetched successfully', data: category })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch category', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch category', error: error.message })
     }
 }
 
@@ -69,7 +69,7 @@ const createCategory = async (req, res) => {
 
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to create category', error: error.message })
+        res.status(500).json({ message: 'Failed to create category', error: error.message })
     }
 }
 /**
@@ -105,7 +105,7 @@ const updateCategory = async (req, res) => {
         res.status(200).json({ message: 'Category updated successfully', data: updatedCategory })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update category', error: error.message })
+        res.status(500).json({ message: 'Failed to update category', error: error.message })
     }
 }
 
@@ -126,7 +126,7 @@ const deleteCategory = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to delete category', error: error.message })
+        res.status(500).json({ message: 'Failed to delete category', error: error.message })
     }
 }
 

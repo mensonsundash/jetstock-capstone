@@ -19,7 +19,7 @@ const getAllProducts = async (req, res) => {
         res.status(200).json({ message: 'Product fetched successfully', data: products })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch product', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch product', error: error.message })
     }
 }
 
@@ -47,7 +47,7 @@ const getProductById = async (req, res) => {
         res.status(200).json({ message: 'Product fetched successfully', data: product })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch product', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch product', error: error.message })
     }
 }
 
@@ -101,11 +101,11 @@ const createProduct = async (req, res) => {
             })
         }
         //Success Response Code 201: Created -> POST create
-        return res.status(201).json({ message: 'Product created successfully', data: result })
+        return res.status(201).json({ message: 'Product created successfully', data: product })
 
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to create product', error: error.message })
+        res.status(500).json({ message: 'Failed to create product', error: error.message })
     }
 }
 /**
@@ -141,7 +141,7 @@ const updateProduct = async (req, res) => {
         res.status(200).json({ message: 'Product updated successfully', data: updatedProduct })
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to update product', error: error.message })
+        res.status(500).json({ message: 'Failed to update product', error: error.message })
     }
 }
 
@@ -162,7 +162,7 @@ const deleteProduct = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to delete product', error: error.message })
+        res.status(500).json({ message: 'Failed to delete product', error: error.message })
     }
 }
 
@@ -200,7 +200,7 @@ const searchProducts = async (req, res) => {
 
     } catch(error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to search products', error: error.message })
+        res.status(500).json({ message: 'Failed to search products', error: error.message })
     }
 }
 
@@ -224,7 +224,7 @@ const getProductsByCategory = async (req, res) => {
         res.status(200).json({message: 'Products fetched successfully', data: products});
     } catch (error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to get products', error: error.message })
+        res.status(500).json({ message: 'Failed to get products', error: error.message })
     }
 };
 
@@ -244,7 +244,7 @@ const getProductsBySupplier = async (req, res) => {
         res.status(200).json({message: 'Products fetched successfully', data: products});
     } catch (error) {
         //Error Response: with status code and json error message
-        req.status(500).json({ message: 'Failed to get products', error: error.message })
+        res.status(500).json({ message: 'Failed to get products', error: error.message })
     }
 };
 

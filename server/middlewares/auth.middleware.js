@@ -19,7 +19,7 @@ const authenticate = (req, res, next) => {
 
         next();// this will pass control to controller
     }catch(error) {
-        return res.status(500).json({message:"Invalid or expired token", error});
+        return res.status(500).json({message:"Invalid or expired token", error: error.message});
     }
 };
 

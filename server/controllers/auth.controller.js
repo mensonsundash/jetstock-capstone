@@ -16,7 +16,7 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body;
         
         //  vlaidate required fields
-        if(!email || !password)  return res.status(400).jsong({ message: "Email and password required"});
+        if(!email || !password)  return res.status(400).json({ message: "Email and password required"});
 
         // find user by email
         const user = await Models.User.findOne({ where: { email } });// using sequelize model findOne function to fetch from user table
@@ -50,7 +50,7 @@ const loginUser = async (req, res) => {
         return res.status(200).json({ message: 'Login successful', token, data:{ userDetails }})
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Login failed', error: error.message })
+        res.status(500).json({ message: 'Login failed', error: error.message })
     }
 }
 
@@ -71,7 +71,7 @@ const getProfile = async (req, res) => {
         res.status(200).json({ message: 'User profile fetched successfully', data: user })
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
-        req.status(500).json({ message: 'Failed to fetch profile', error: error.message })
+        res.status(500).json({ message: 'Failed to fetch profile', error: error.message })
     }
 };
 

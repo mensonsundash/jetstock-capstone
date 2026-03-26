@@ -23,9 +23,6 @@ async function init() {
     
 }
 
-//calling initialization function to load all models
-init();
-
 /** #### Associations & Relationship #### */
 
 /** User relationships**/
@@ -90,6 +87,11 @@ init();
     // OrderItem -> StockMovement: One to Many relationship
     OrderItem.hasMany(StockMovement, { foreignKey: "order_item_id", as: "stock_movements" });
     StockMovement.belongsTo(OrderItem, { foreignKey: "order_item_id", as: "order_items" });
+
+
+//calling initialization function to load all models
+init();
+
 
 module.exports = {
     User,
