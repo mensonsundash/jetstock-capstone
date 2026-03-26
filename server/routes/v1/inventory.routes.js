@@ -10,13 +10,19 @@ const { getAllInventory,
     getInventorySummary,
     updateInventory } = require("../../controllers/inventory.controller");
 
+    
+// importing middleware that verifies user token and roles
+const authenticate = require("../../middlewares/auth.middleware"); // importing auth middleware
+const authorizeRoles = require("../../middlewares/role.middleware"); // importing role middleware
+
 //CRUD routers connecting its controllers
-app.get("/", getAllInventory);
-app.get("/:id", getInventoryById);
-app.get("/product/:productId", getInventoryByProductId);
-app.get("/summary", getInventorySummary);
-app.get("/low-stock", getLowStockItems);
-app.get("/out-of-stock", getOutOfStockItems);
-app.put("/product/:productId", updateInventory);
+// Protected: loggedin user and admin can get/post/put/delete operations
+app.get("/", authenticate, authorizeRoles("admin", "user"), getAllInventory);
+app.get("/:id", authenticate, authorizeRoles("admin", "user"), getInventoryById);
+app.get("/product/:productId", authenticate, authorizeRoles("admin", "user"), getInventoryByProductId);
+app.get("/summary", authenticate, authorizeRoles("admin", "user"), getInventorySummary);
+app.get("/low-stock", authenticate, authorizeRoles("admin", "user"), getLowStockItems);
+app.get("/out-of-stock", authenticate, authorizeRoles("admin", "user"), getOutOfStockItems);
+app.put("/product/:productId", authenticate, authorizeRoles("admin", "user"), updateInventory);
 
 module.exports = app;
