@@ -1,11 +1,15 @@
 const Models  = require('../models');
 
+const bcrypt = require("bcrypt"); // importing password hashing using bcrypt
+
 /**
  * Function to get all users list
  */
 const getAllUsers = async (req, res) => {
     try{
-        const users = await Models.User.findAll();// using sequelize model findAll function to fetch from user table
+        const users = await Models.User.findAll({
+            attributes: { exclude: ["password"] }
+        });// using sequelize model findAll function to fetch from user table and exclude password
 
         //Success Response code 200: OK -> Success
         res.status(200).json({ message: 'User fetched successfully', data: users })
@@ -23,7 +27,10 @@ const getUserById = async (req, res) => {
 
         const userId = req.params.id; // getting id from params provided on request
 
-        const user = await Models.User.findByPk(userId); // using sequelize find by primary key
+        // protecting exposure of password
+        const user = await Models.User.findByPk(userId, {
+            attributes: { exclude: ["password"] }
+        }); // using sequelize find by primary key and attribute feature to exclude password field
 
         //checking if user not exist and stop : Code 404: Not Found
         if(!user) return res.status(404).json({ message: "User not found"})
@@ -60,18 +67,33 @@ const createUser = async (req, res) => {
             return res.status(409).json({ message: 'User with this email already exists'})
         }
 
-        const result = await Models.User.create({
+        // hashing password using bcrypt
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const user = await Models.User.create({
             first_name,
             last_name,
             email,
-            password,
+            password: hashedPassword,
             business_name,
             phone,
             address,
             role: role || 'user'
         });
+
+        //protecting expose of password so separate details of user without password
+        const userDetails = {
+            id:user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            email: user.email,
+            business_name: user.business_name,
+            phone: user.phone,
+            address: user.address,
+            role: user.role
+        };
         //Success Response Code 201: Created -> POST create
-        return res.status(201).json({ message: 'User created successfully', data: result })
+        return res.status(201).json({ message: 'User created successfully', data: userDetails })
 
     } catch(error) {
         //Error Response code 500: Internal server error -> unhandled exception
@@ -100,6 +122,11 @@ const updateUser = async (req, res) => {
                 return res.status(409).json({ message: 'User with this email already exists'})
             }
         } 
+
+         // hashing password using bcrypt before saving updates
+         if(req.body.password) {
+            req.body.password = await bcrypt.hash(req.body.password, 10);
+         }       
 
         //update user row with user id and replicate body data 
         const updatedUser = await Models.User.update(
