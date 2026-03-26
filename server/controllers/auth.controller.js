@@ -2,6 +2,12 @@ const bcrypt = require("bcrypt"); // importing encryption method bcrypt for pass
 const Models = require("../models"); // imporing models
 
 const { generateToken } = require("../utils/jwt.utils"); // importing jwt utility
+const { createUser } = require("./user.controller"); // importing createUser function from user.controller
+
+// Deligation: registering user by reusing usercontroller createuser function
+const registerUser = async (req, res) => {
+    return createUser(req, res);
+} 
 
 // User login function
 const loginUser = async (req, res) => {
