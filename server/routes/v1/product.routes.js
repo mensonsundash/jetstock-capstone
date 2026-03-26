@@ -11,14 +11,27 @@ const { getAllProducts,
     updateProduct,
     deleteProduct} = require("../../controllers/product.controller");
 
+
+
+// importing middleware that verifies user token and roles
+const authenticate = require("../../middlewares/auth.middleware"); // importing auth middleware
+const authorizeRoles = require("../../middlewares/role.middleware"); // importing role middleware
+
 //CRUD routers connecting its controllers
-app.get("/", getAllProducts);
-app.get("/:id", getProductById);
-app.get("/supplier/:supplierId", getProductsBySupplier);
-app.get("/category/:categoryId", getProductsByCategory);
-app.get("/search", searchProducts);
-app.post("/", createProduct);
-app.put("/:id", updateProduct);
-app.delete("/:id", deleteProduct);
+
+// Protected: loggedin user and admin can view categories
+app.get("/", authenticate, authorizeRoles("admin", "user"), getAllCategories);
+app.get("/:id", authenticate, authorizeRoles("admin", "user"), getCategoryById);
+
+//CRUD routers connecting its controllers
+// Protected: loggedin user and admin can get/post/put/delete operations
+app.get("/", authenticate, authorizeRoles("admin", "user"), getAllProducts);
+app.get("/:id", authenticate, authorizeRoles("admin", "user"), getProductById);
+app.get("/supplier/:supplierId", authenticate, authorizeRoles("admin", "user"), getProductsBySupplier);
+app.get("/category/:categoryId", authenticate, authorizeRoles("admin", "user"), getProductsByCategory);
+app.get("/search", authenticate, authorizeRoles("admin", "user"), searchProducts);
+app.post("/", authenticate, authorizeRoles("admin", "user"), createProduct);
+app.put("/:id", authenticate, authorizeRoles("admin", "user"), updateProduct);
+app.delete("/:id", authenticate, authorizeRoles("admin", "user"), deleteProduct);
 
 module.exports = app;
