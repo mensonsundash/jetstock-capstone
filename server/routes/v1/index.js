@@ -5,7 +5,8 @@ app.get("/", (req,res) => {
     res.json({message: "Welcome to Routes api: V1"});
 })
 
-
+//autherntication routes
+app.use("/auth", require("./auth.routes"))
 // sub router of server
 app.use("/users", require("./user.routes")); // router to user routes
 app.use("/suppliers", require("./supplier.routes")); // router to user routes
