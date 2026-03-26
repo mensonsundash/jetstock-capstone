@@ -18,12 +18,6 @@ const authenticate = require("../../middlewares/auth.middleware"); // importing 
 const authorizeRoles = require("../../middlewares/role.middleware"); // importing role middleware
 
 //CRUD routers connecting its controllers
-
-// Protected: loggedin user and admin can view categories
-app.get("/", authenticate, authorizeRoles("admin", "user"), getAllCategories);
-app.get("/:id", authenticate, authorizeRoles("admin", "user"), getCategoryById);
-
-//CRUD routers connecting its controllers
 // Protected: loggedin user and admin can get/post/put/delete operations
 app.get("/", authenticate, authorizeRoles("admin", "user"), getAllProducts);
 app.get("/:id", authenticate, authorizeRoles("admin", "user"), getProductById);
