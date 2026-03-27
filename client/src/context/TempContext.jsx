@@ -3,8 +3,9 @@ import { createContext } from "react";
 
 export const TempContext = createContext(); // create context
 
+// temporary provider
 export const TempProvider = ({children}) => {
-    // store message
+    // store placeholder message
     const showMessage = (message) => {
         console.log("Temporary message:", message);
     };
