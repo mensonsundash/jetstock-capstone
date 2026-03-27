@@ -4,10 +4,10 @@ import { Box, CircularProgress } from "@mui/material";
 const Loader = () => {
     return(
         <Box 
-        display={"flex"}
-        justifyContent={"center"}
-        alignContent={"center"}
-        minHeight={"60vh"}
+        display="flex"
+        justifyContent="center"
+        alignContent="center"
+        minHeight="60vh"
         >
             <CircularProgress />
         </Box>
