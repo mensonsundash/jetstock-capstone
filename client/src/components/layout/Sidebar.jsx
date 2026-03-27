@@ -5,6 +5,8 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 import WarehouseIcon from "@mui/icons-material/Warehouse";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import InputIcon from "@mui/icons-material/Input";
+import OutputIcon from "@mui/icons-material/Output";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import { NavLink } from "react-router-dom";
 
@@ -15,8 +17,8 @@ const menuItems = [
   { text: "Suppliers", path: "/suppliers", icon: <LocalShippingIcon /> },
   { text: "Products", path: "/products", icon: <Inventory2Icon /> },
   { text: "Inventory", path: "/inventory", icon: <WarehouseIcon /> },
-  { text: "Stock In", path: "/stock-in", icon: <SwapHorizIcon /> },
-  { text: "Stock Out", path: "/stock-out", icon: <SwapHorizIcon /> },
+  { text: "Stock In", path: "/stock-in", icon: <InputIcon /> },
+  { text: "Stock Out", path: "/stock-out", icon: <OutputIcon /> },
   { text: "Stock Movements", path: "/stock-movements", icon: <SwapHorizIcon /> },
   { text: "Reports", path: "/reports", icon: <AssessmentIcon /> },
 ];
