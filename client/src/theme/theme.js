@@ -1,5 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 
+// this theme will defines JetStock app colors, background etc
 const theme = createTheme({
     palette: {
         primary: {
