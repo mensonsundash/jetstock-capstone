@@ -7,7 +7,13 @@ const bcrypt = require("bcrypt"); // importing password hashing using bcrypt
  */
 const getAllUsers = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         const users = await Models.User.findAll({
+            where: whereClause,
             attributes: { exclude: ["password"] }
         });// using sequelize model findAll function to fetch from user table and exclude password
 

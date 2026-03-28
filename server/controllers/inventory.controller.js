@@ -6,10 +6,15 @@ const Models  = require('../models');
  */
 const getAllInventory = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         // fetching inventory table and joining related table with alias as: supplier, category & inventory 
         const inventory = await Models.Inventory.findAll({
             include:[
-                { model: Models.Product, as: "product" },
+                { model: Models.Product, as: "product" , where: whereClause},
             ]
         });// using sequelize model findAll function to fetch with include feature to join another tables
 
@@ -80,12 +85,16 @@ const getInventoryByProductId = async (req, res) => {
  */
 const getLowStockItems = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
 
         // fetching inventory table with where, col sequelize feautre to compare two columns
         const inventories = await Models.Inventory.findAll({
             where: where(col('quantity_on_hand'), "<=", col('reorder_level')),
             include:[
-                { model: Models.Product, as: "product" }
+                { model: Models.Product, as: "product", where: whereClause }
             ]
         }); // using sequelize findOne with include feature to join another tables and compare operator for 2 columns
 
@@ -105,12 +114,16 @@ const getLowStockItems = async (req, res) => {
  */
 const getOutOfStockItems = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
 
         // fetching inventory table with where QOH is 0
         const inventories = await Models.Inventory.findAll({
             where: {quantity_on_hand: 0},
             include:[
-                { model: Models.Product, as: "product" }
+                { model: Models.Product, as: "product", where: whereClause }
             ]
         }); // using sequelize findOne with include feature to join another tables
 
@@ -131,10 +144,15 @@ const getOutOfStockItems = async (req, res) => {
 const getInventorySummary = async (req, res) => {
     try{
 
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         // fetching inventory table with where, col sequelize feautre to compare two columns
         const inventories = await Models.Inventory.findAll({
             include:[
-                { model: Models.Product, as: "product" }
+                { model: Models.Product, as: "product", where: whereClause }
             ]
         }); // using sequelize findOne with include feature to join another tables
 

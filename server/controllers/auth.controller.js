@@ -37,7 +37,6 @@ const loginUser = async (req, res) => {
 
         // user information
         const userDetails = {
-            id: user.id,
             first_name: user.first_name,
             last_name: user.last_name,
             email: user.email,

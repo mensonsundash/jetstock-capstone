@@ -6,8 +6,14 @@ const Models  = require('../models');
  */
 const getAllProducts = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         // fetching product table and joining related table with alias as: supplier, category & inventory 
         const products = await Models.Product.findAll({
+            where: whereClause,
             include:[
                 { model: Models.Supplier, as: "supplier" },
                 { model: Models.Category, as: "category" },
@@ -172,17 +178,27 @@ const deleteProduct = async (req, res) => {
 const searchProducts = async (req, res) => {
     try{
         const { q } = req.query;
-        
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         // fetching product table and joining related table with alias as: supplier, category & inventory 
         // where condition sequelize sql query 
         // or: One of the condition should match
         // like: SQL Like to match query keyword from anywhere 
         const products = await Models.Product.findAll({
             where: {
-                [Op.or]: [
-                    {name: { [Op.like]: `%${q}%` } },
-                    {sku: { [Op.like]: `%${q}%` } },
+                [Op.and]: [
+                    whereClause,
+                    {
+                        [Op.or]: [
+                            {name: { [Op.like]: `%${q}%` } },
+                            {sku: { [Op.like]: `%${q}%` } },
+                        ]
+                    }
                 ]
+                
             },
             include:[
                 { model: Models.Supplier, as: "supplier" },
@@ -210,8 +226,14 @@ const searchProducts = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
     try {
         const {categoryId} = req.params;
+
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         const products = await Models.Product.findAll({
-            where: { category_id: categoryId },
+            where: { whereClause, category_id: categoryId },
             include: [
                 { model: Models.Inventory, as: "inventory" }
             ],
@@ -231,8 +253,14 @@ const getProductsByCategory = async (req, res) => {
 const getProductsBySupplier = async (req, res) => {
     try {
         const {supplierId} = req.params;
+        
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         const products = await Models.Product.findAll({
-            where: { supplier_id: supplierId },
+            where: { whereClause, supplier_id: supplierId },
             include: [
                 { model: Models.Inventory, as: "inventory" }
             ],
