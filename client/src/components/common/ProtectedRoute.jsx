@@ -1,10 +1,16 @@
 import { useAuth } from "../../hooks/useAuth";
 import { Navigate } from "react-router-dom";
+import Loader from "./Loader";
 
-// block access to private pages and redirect to login for non authenticated user
+// Protect Private routes: if auth still loading, show loader
+// if no token/session exist , redirect to login
 const ProtectedRoute = ({children}) => {
 
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
+
+    if(loading) {
+        return <Loader />
+    } 
 
     //if not authenticated direct to login page
     if(!isAuthenticated) {
