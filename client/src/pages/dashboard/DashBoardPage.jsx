@@ -84,8 +84,6 @@ const DashboardPage = () => {
     return <Loader />
   }
 
-  console.log("All data: ", dashboardData)
-
   return (
       <Stack spacing={3}>
         {/* Page heading */}
