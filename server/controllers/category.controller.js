@@ -5,7 +5,12 @@ const Models  = require('../models');
  */
 const getAllCategories = async (req, res) => {
     try{
-        const categories = await Models.Category.findAll();// using sequelize model findAll function to fetch from category table
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
+        const categories = await Models.Category.findAll({where: whereClause});// using sequelize model findAll function to fetch from category table
 
         //Success Response code 200: OK -> Success
         res.status(200).json({ message: 'Category fetched successfully', data: categories })

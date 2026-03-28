@@ -5,7 +5,12 @@ const Models  = require('../models');
  */
 const getAllCustomers = async (req, res) => {
     try{
-        const customers = await Models.Customer.findAll();// using sequelize model findAll function to fetch from customer table
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
+        const customers = await Models.Customer.findAll({where: whereClause});// using sequelize model findAll function to fetch from customer table
 
         //Success Response code 200: OK -> Success
         res.status(200).json({ message: 'Customer fetched successfully', data: customers })

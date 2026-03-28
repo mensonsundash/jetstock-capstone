@@ -6,8 +6,14 @@ const Models  = require('../models');
  */
 const getAllStockMovements = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         // fetching stockMovement table and joining related table with alias as: product
         const stockMovements = await Models.StockMovement.findAll({
+            where: whereClause,
             include:[
                 { model: Models.Product, as: "product" },
             ],
@@ -58,9 +64,14 @@ const getStockMovementsByProductId = async (req, res) => {
 
         const { productId } = req.params; // getting product id from params provided on request
 
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+
         // fetching stockMovement table and joining related table with alias as: product 
         const stockMovements = await Models.StockMovement.findAll({
-            where: { product_id: productId },
+            where: { whereClause, product_id: productId },
             include:[
                 { model: Models.Product, as: "product" }
             ],

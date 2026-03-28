@@ -6,9 +6,15 @@ const Models  = require('../models');
  */
 const getAllOrders = async (req, res) => {
     try{
+        // loggedin user data only
+        const {id, role} = req.user;
+        let whereClause = {};
+        if(role !== 'admin') whereClause.user_id = id;
+        
         // fetching order table and joining related table with alias as: customer, orderItem & 
         // nested table include inside orderItem as product
         const orders = await Models.Order.findAll({
+            where: whereClause,
             include: [
                 { model: Models.Customer, as: 'customer'},
                 { model: Models.OrderItem, as: 'items', include:[
