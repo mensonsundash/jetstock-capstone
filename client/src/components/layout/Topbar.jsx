@@ -16,8 +16,9 @@ const Topbar = ({ drawerWidth }) => {
     >
         {/* headers */}
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
+        
         <Typography variant="h6" noWrap component="div">
-          JetStock
+          Application
         </Typography>
         
         {/* logout button */}
