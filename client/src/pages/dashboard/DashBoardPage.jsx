@@ -5,7 +5,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 
 import { useEffect, useState } from "react";
-import { getAllProduct } from "../../api/productApi";
+import { getAllProducts } from "../../api/productApi";
 import { getAllCategories } from "../../api/categoryApi";
 import { getAllSuppliers } from "../../api/supplierApi";
 import { getInventorySummary, getLowStockItems } from "../../api/inventoryApi";
@@ -14,18 +14,19 @@ import { getAllStockMovements } from "../../api/stockMovementApi";
 import Loader from "../../components/common/Loader";
 import DashboardCard from "../../components/layout/DashboardCard";
 
+
 // Dashboard page
 //using useEffect to fetch backend data when page loads
 // displays summary cards, low stock items, recent stocko movements
 const DashboardPage = () => {
   // dashboard states
-  const [dashboardData, setDashboardData] = useState({
+   const [dashboardData, setDashboardData] = useState({
     totalProducts: 0,
     totalCategories: 0,
     totalSuppliers: 0,
     lowStockCount: 0,
     lowStockItems: [],
-    recentMovements: []
+    recentMovements: [],
   });
 
   // Loading / error UI states
@@ -47,7 +48,7 @@ const DashboardPage = () => {
         lowStockResponse,
         stockMovementsResponse,
       ] = await Promise.all([
-        getAllProduct(),
+        getAllProducts(),
         getAllCategories(),
         getAllSuppliers(),
         getInventorySummary(),
@@ -57,13 +58,14 @@ const DashboardPage = () => {
 
       //calling set dasbord data function: changing state value
       setDashboardData({
-        totalProducts: productsResponse.count || 0,
-        totalCategories: categoriesResponse.count || 0,
-        totalSuppliers: suppliersResponse.count || 0,
+        totalProducts: productsResponse.data.length || 0,
+        totalCategories: categoriesResponse.data.length || 0,
+        totalSuppliers: suppliersResponse.data.length || 0,
         lowStockCount:  inventorySummaryResponse.data.lowStockCount || 0,
         lowStockItems: lowStockResponse.data || [],
-        recentMovements: stockMovementsResponse.data || []
+        recentMovements: (stockMovementsResponse.data || []).slice(0,5)
       });
+
 
     } catch(error) {
       setError(error.response.data.message || "Failed to load dashboard data");
@@ -81,6 +83,8 @@ const DashboardPage = () => {
   if(loading) {
     return <Loader />
   }
+
+  console.log("All data: ", dashboardData)
 
   return (
       <Stack spacing={3}>
@@ -163,6 +167,7 @@ const DashboardPage = () => {
                   )}
                 </Paper>
               </Grid>
+              
               {/* Recent stock movements */}
               <Grid item xs={12} md={6}>
                 <Paper sx={{ p: 3 }}>
