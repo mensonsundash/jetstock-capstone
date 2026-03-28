@@ -1,9 +1,17 @@
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
+// Top Bar: navigation bar shown on all protected pages
 const Topbar = ({ drawerWidth }) => {
-    //logout function from auth context
-  const { logout } = useAuth();
+  //logout function from auth context
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout= () => {
+    logout();
+    navigate("/login");
+  }
 
   return (
     // fixed topbar
@@ -22,8 +30,11 @@ const Topbar = ({ drawerWidth }) => {
         </Typography>
         
         {/* logout button */}
-        <Box>
-          <Button color="inherit" onClick={logout}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant="body2">
+              {user ? `${user.first_name || ""} ${user.last_name || "" } `. trim() : "User"}
+          </Typography>
+          <Button color="inherit" onClick={handleLogout}>
             Logout
           </Button>
         </Box>
