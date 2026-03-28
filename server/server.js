@@ -3,13 +3,20 @@ const app = express(); // creating express app
 
 //dotenv config import before db connection
 require("dotenv").config();
+
+const cors = require("cors"); // importing cors module
 const PORT = process.env.PORT || 3000;
 
 //help to connect database directly as connection function already called inside it
 require("./config/db.config");
 
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+}));
 // parse requests of content-type = application/json
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //testing api route health
 app.get("/", (req, res) => {
