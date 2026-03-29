@@ -1,7 +1,7 @@
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { AuthProvider } from "../context/AuthContext";
-import { TempProvider } from "../context/TempContext";
 import theme from "../theme/theme";
+import { ToastProvider } from "../context/ToastContext";
 
 
 export const AppProviders = ({children}) => {
@@ -10,13 +10,11 @@ export const AppProviders = ({children}) => {
         <ThemeProvider theme={theme}>
             {/* reset browser default styles */}
             <CssBaseline />
-                <TempProvider >
+                <ToastProvider >
                     <AuthProvider>
                         {children}
                     </AuthProvider>
-                </TempProvider>
-                
-            
+                </ToastProvider>
         </ThemeProvider>
     );
 };
