@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Stack, MenuItem } from "@mui/material";
+import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Stack, MenuItem, Paper, Typography, Box } from "@mui/material";
 
 /**
  * Reusable product form dialog: Used for both create and edit actions
@@ -152,7 +152,18 @@ const ProductForm = ({
             <TextField label="Description" name="description" value={formData.description} onChange={handleChange} fullWidth multiline minRows={3} />
             <TextField label="Price" name="price" type="number" value={formData.price} onChange={handleChange} fullWidth required />
                 
-            <TextField label="Image URL" name="image_url" value={formData.image_url} onChange={handleChange} fullWidth required />
+            <TextField label="Image URL" name="image_url" value={formData.image_url} onChange={handleChange} fullWidth placeholder="https://example.com/product-image.jpg" required />
+
+              {/* Live preview of image URL */}
+              {formData.image_url && (
+                <Paper variant="outlined" sx={{ p: 2 }}>
+                  <Typography variant="body" color="text.secondary" mb={1}>Image Preview</Typography>
+                  <Box component="img" src={formData.image_url} alt="Product Preview" 
+                  sx={{ width:140, height:140, objectFit: "cover", borderRadius:1, border: "1px solid #ddd" }} 
+                  onError={(e) => {e.currentTarget.style.display = "none"; }} /> 
+                </Paper>
+              )}
+
             <TextField label="Quantity on Hand" name="quantity_on_hand" type="number" value={formData.quantity_on_hand} onChange={handleChange} fullWidth />
             <TextField label="Reorder Level" name="reorder_level" type="number" value={formData.reorder_level} onChange={handleChange} fullWidth />
             <TextField label="Location" name="location" value={formData.location} onChange={handleChange} fullWidth />
