@@ -16,5 +16,6 @@ app.use("/inventory", require("./inventory.routes")); // router to user routes
 app.use("/stock-movements", require("./stockMovement.routes")); // router to user routes
 app.use("/customers", require("./customer.routes")); // router to user routes
 app.use("/orders", require("./order.routes")); // router to user routes
+app.use("/reports", require("./report.routes")); // router to report routes
 
 module.exports = app;
