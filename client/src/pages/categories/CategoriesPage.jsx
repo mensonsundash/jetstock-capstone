@@ -8,6 +8,7 @@ import { createCategory, deleteCategory, getAllCategories, updateCategory } from
 import Loader from "../../components/common/Loader";
 import CategoryForm from "../../components/forms/CategoryForm";
 import { useToast } from "../../hooks/useToast";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 // categories page : Show cateogry list and handle create, update, delete operations
 const CategoriesPage = () => {
@@ -26,6 +27,10 @@ const CategoriesPage = () => {
   // Dialog state
   const [openForm, setOpenForm] = useState(false); // control dialog form is visible or not
   const [selectedCategory, setSelectedCategory] = useState(null);// selectedCategory if edit mode then its has data if not then null for add mode
+
+  // Confirm dialog state for delete action
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState(null);
 
   // Load categories on page mount
   const fetchCategories = async () => {
@@ -100,25 +105,35 @@ const CategoriesPage = () => {
     }
   };
 
-  // Delete category
-  const handleDeleteCategory = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this category?"
-    );
+  // Open confirm dialog before delete
+  const handleOpenDeleteConfirm = (category) => {
+    setCategoryToDelete(category);
+    setOpenConfirm(true);
+  };
 
-    if (!confirmed) return;
+  // Close confirm dialog
+  const handleCloseDeleteConfirm = () => {
+    setCategoryToDelete(null);
+    setOpenConfirm(false);
+  };
+
+  // Delete confirm category
+  const handleConfirmDeleteCategory = async () => {
+    if(!categoryToDelete) return;
 
     try {
       setError("");
       setSuccess("");
 
-      await deleteCategory(id);
+      await deleteCategory(categoryToDelete.id);
       showSuccess("Category deleted successfully");
       await fetchCategories();
     } catch (err) {
       const message = err?.response?.data?.message || "Failed to delete category";
       setError(message);
       showError(message);
+    } finally{
+      handleCloseDeleteConfirm();
     }
   };
 
@@ -180,7 +195,7 @@ const CategoriesPage = () => {
 
                     <IconButton
                       color="error"
-                      onClick={() => handleDeleteCategory(category.id)}
+                      onClick={() => handleOpenDeleteConfirm(category)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -200,6 +215,16 @@ const CategoriesPage = () => {
         initialValues={selectedCategory}
         submitting={submitting}
       />
+
+      {/* Confirm Dialog */}
+            <ConfirmDialog
+              open={openConfirm}
+              title="Delete Category"
+              message={`Are you sure you want to delete "${categoryToDelete?.name || "this category"}"?`}
+              onClose={handleCloseDeleteConfirm}
+              onConfirm={handleConfirmDeleteCategory}
+              confirmText="Delete"
+            />
     </Stack>
   );
 };

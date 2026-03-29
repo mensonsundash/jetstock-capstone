@@ -12,6 +12,7 @@ import { getAllCategories } from "../../api/categoryApi";
 import { getAllSuppliers } from "../../api/supplierApi";
 import useDebounce from "../../hooks/useDebounce";
 import { useToast } from "../../hooks/useToast";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 // Products page
 // Handles: - product listing, create / update / delete, server-side: search, category/supplier filter, client-side: sorting
@@ -30,6 +31,10 @@ const ProductsPage = () => {
   // Dialog state
   const [openForm, setOpenForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Confirm dialog state for delete action
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   // Global toast helpers
   const { showSuccess, showError } = useToast();
@@ -207,20 +212,27 @@ const ProductsPage = () => {
       setSubmitting(false);
     }
   };
+// Open confirm dialog before delete
+  const handleOpenDeleteConfirm = (product) => {
+    setProductToDelete(product);
+    setOpenConfirm(true);
+  };
 
-  // Delete product
-  const handleDeleteProduct = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this product?"
-    );
+  // Close confirm dialog
+  const handleCloseDeleteConfirm = () => {
+    setProductToDelete(null);
+    setOpenConfirm(false);
+  };
 
-    if (!confirmed) return;
+  // Delete confirmed product
+  const handleConfirmDeleteProduct = async () => {
+    if (!productToDelete) return;
 
     try {
       setError("");
       setSuccess("");
 
-      await deleteProduct(id);
+      await deleteProduct(productToDelete.id);
       showSuccess("Product deleted successfully");
       await fetchAllProductsData({
               q: debouncedSearchText,
@@ -418,7 +430,7 @@ const ProductsPage = () => {
 
                       <IconButton
                         color="error"
-                        onClick={() => handleDeleteProduct(product.id)}
+                        onClick={() => handleOpenDeleteConfirm(product)}
                       >
                         <DeleteIcon />
                       </IconButton>
@@ -450,6 +462,16 @@ const ProductsPage = () => {
         suppliers={suppliers}
         submitting={submitting}
       />
+      {/* Confirmation dialog for delete */}
+        <ConfirmDialog
+        open={openConfirm}
+        title="Delete Product"
+        message={`Are you sure you want to delete "${productToDelete?.name || "this product"}"?`}
+        onClose={handleCloseDeleteConfirm}
+        onConfirm={handleConfirmDeleteProduct}
+        confirmText="Delete"
+      />
+
     </Stack>
   );
 };

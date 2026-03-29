@@ -8,6 +8,7 @@ import Loader from "../../components/common/Loader";
 import SupplierForm from "../../components/forms/SupplierForm";
 import { getAllSuppliers, createSupplier, updateSupplier, deleteSupplier, } from "../../api/supplierApi";
 import { useToast } from "../../hooks/useToast";
+import ConfirmDialog from "../../components/common/ConfirmDialog";
 
 
 // Suppliers page: Show supplier list and handle create, update, delete operations
@@ -27,6 +28,10 @@ const SuppliersPage = () => {
   // Dialog state
   const [openForm, setOpenForm] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+  // Confirm dialog state for delete action
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
 
   // Load suppliers from backend
   const fetchSuppliers = async () => {
@@ -99,19 +104,27 @@ const SuppliersPage = () => {
     }
   };
 
-  // Delete supplier
-  const handleDeleteSupplier = async (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this supplier?"
-    );
+  // Open confirm dialog before delete
+  const handleOpenDeleteConfirm = (supplier) => {
+    setSupplierToDelete(supplier);
+    setOpenConfirm(true);
+  };
 
-    if (!confirmed) return;
+  // Close confirm dialog
+  const handleCloseDeleteConfirm = () => {
+    setSupplierToDelete(null);
+    setOpenConfirm(false);
+  };
+
+  // Delete confirmed supplier
+  const handleConfirmDeleteSupplier = async () => {
+    if (!supplierToDelete) return;
 
     try {
       setError("");
       setSuccess("");
 
-      await deleteSupplier(id);
+      await deleteSupplier(supplierToDelete.id);
       showSuccess("Supplier deleted successfully");
       await fetchSuppliers();
     } catch (err) {
@@ -188,7 +201,7 @@ const SuppliersPage = () => {
 
                     <IconButton
                       color="error"
-                      onClick={() => handleDeleteSupplier(supplier.id)}
+                      onClick={() => handleOpenDeleteConfirm(supplier)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -207,6 +220,16 @@ const SuppliersPage = () => {
         onSubmit={handleSubmitSupplier}
         initialValues={selectedSupplier}
         submitting={submitting}
+      />
+
+      {/* Confirm dialog to delete */}
+      <ConfirmDialog
+        open={openConfirm}
+        title="Delete Supplier"
+        message={`Are you sure you want to delete "${supplierToDelete?.name || "this supplier"}"?`}
+        onClose={handleCloseDeleteConfirm}
+        onConfirm={handleConfirmDeleteSupplier}
+        confirmText="Delete"
       />
     </Stack>
   );
