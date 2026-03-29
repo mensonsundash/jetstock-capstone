@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { createCategory, deleteCategory, getAllCategories, updateCategory } from "../../api/categoryApi";
 import Loader from "../../components/common/Loader";
 import CategoryForm from "../../components/forms/CategoryForm";
+import { useToast } from "../../hooks/useToast";
 
 // categories page : Show cateogry list and handle create, update, delete operations
 const CategoriesPage = () => {
@@ -18,6 +19,9 @@ const CategoriesPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Global toast helpers
+  const { showSuccess, showError } = useToast();
 
   // Dialog state
   const [openForm, setOpenForm] = useState(false); // control dialog form is visible or not
@@ -78,16 +82,18 @@ const CategoriesPage = () => {
       // with payload send to api
       if (selectedCategory) {
         await updateCategory(selectedCategory.id, payload);
-        setSuccess("Category updated successfully");
+        showSuccess("Category updated successfully");
       } else {
         await createCategory(payload);
-        setSuccess("Category created successfully");
+        showSuccess("Category created successfully");
       }
 
       handleCloseForm();
       await fetchCategories();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to save category");
+      const message = err?.response?.data?.message || "Failed to save category";
+      setError(message);
+      showError(message)
       throw err;
     } finally {
       setSubmitting(false);
@@ -107,10 +113,12 @@ const CategoriesPage = () => {
       setSuccess("");
 
       await deleteCategory(id);
-      setSuccess("Category deleted successfully");
+      showSuccess("Category deleted successfully");
       await fetchCategories();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete category");
+      const message = err?.response?.data?.message || "Failed to delete category";
+      setError(message);
+      showError(message);
     }
   };
 
