@@ -348,6 +348,7 @@ const ProductsPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell><strong>ID</strong></TableCell>
+                <TableCell><strong>Image</strong></TableCell>
                 <TableCell><strong>SKU</strong></TableCell>
                 <TableCell><strong>Name</strong></TableCell>
                 <TableCell><strong>Category</strong></TableCell>
@@ -364,6 +365,13 @@ const ProductsPage = () => {
               {sortedProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.id}</TableCell>
+                  <TableCell>
+                    {product.image_url ? (
+                      <Box component="img" src={product.image_url} alt={product.name} 
+                      sx={{ width:50, height:50, objectFit: "cover", borderRadius:1, border: "1px solid #ddd" }} 
+                        onError={(e) => {e.currentTarget.style.display = "none"; }} /> 
+                    ): ("-")}
+                  </TableCell>
                   <TableCell>{product.sku}</TableCell>
                   <TableCell>{product.name}</TableCell>
                   <TableCell>{product.category?.name || "-"}</TableCell>

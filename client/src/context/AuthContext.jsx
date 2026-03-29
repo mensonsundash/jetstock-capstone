@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { storage } from "../utils/storage";
 import { getProfile, loginUser, registerUser } from "../api/authApi";
+import { useToast } from "../hooks/useToast";
 
 export const AuthContext = createContext(); // creating context
 
@@ -10,6 +11,9 @@ export const AuthProvider = ({children}) => {
     const [user, setUser] = useState(storage.getUser());
     const [token, setToken] = useState(storage.getToken());
     const [loading, setLoading] = useState(true);
+
+      // Global toast helpers
+      const { showSuccess, showError } = useToast();
 
     // login function : send user detail to backend, save token & user in session, update react state
     const login = async (email, password) => {
@@ -27,6 +31,7 @@ export const AuthProvider = ({children}) => {
         setToken(receiveToken);
         setUser(loggedInUser);
 
+        showSuccess("Login successfully");
         return response;
     }
 
@@ -41,6 +46,7 @@ export const AuthProvider = ({children}) => {
         storage.clearAuth();
         setToken(null);
         setUser(null);
+        showSuccess("Logout successfully");
     }
 
     // persistent data
