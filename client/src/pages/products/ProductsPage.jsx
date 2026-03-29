@@ -1,4 +1,4 @@
-import { Alert, Box, Button, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TablePagination, TableRow, TextField, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -39,6 +39,10 @@ const ProductsPage = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [selectedSupplierId, setSelectedSupplierId] = useState("");
   const [sortBy, setSortBy] = useState("");
+
+  // pagination states
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   // debounced search text : this value only changes after the user stops typing
   const debouncedSearchText = useDebounce(searchText.trim(), 500);
@@ -105,7 +109,10 @@ const ProductsPage = () => {
       categoryId: selectedCategoryId,
       supplierId: selectedSupplierId
     });
-  }, [debouncedSearchText, selectedCategoryId, selectedSupplierId]);
+
+    //reset current page when search filter values changes
+    setPage(0);
+  }, [debouncedSearchText, selectedCategoryId, selectedSupplierId, sortBy]);
 
   // SORT: Apply client-side sort to the currently loaded product list
   const sortedProducts = useMemo(() => {
@@ -129,6 +136,14 @@ const ProductsPage = () => {
     }
   }, [products, sortBy]);
 
+  // slice sorted products for the current page
+  const paginatedProducts = useMemo(() => {
+    const startIndex = page * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+
+    return sortedProducts.slice(startIndex, endIndex);
+  }, [sortedProducts, page, rowsPerPage]);
+
   // Open create form
   const handleOpenCreate = () => {
     setSelectedProduct(null);
@@ -150,6 +165,17 @@ const ProductsPage = () => {
     setOpenForm(false);
     setSelectedProduct(null);
   };
+
+  // Handle page change
+  const handleChangePage = (_, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle rows-per-page change
+  const handleChangeRowsPerPage = (e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(0);
+  }
 
   // Create or update product
   const handleSubmitProduct = async (payload) => {
@@ -214,6 +240,7 @@ const ProductsPage = () => {
     setSelectedCategoryId("");
     setSelectedSupplierId("");
     setSortBy("");
+    setPage(0);
   };
 
   if (loading) {
@@ -245,97 +272,97 @@ const ProductsPage = () => {
       {success && <Alert severity="success">{success}</Alert>}
 
       {/* Search / filter / sort controls */}
-<Paper sx={{ p: 2 }}>
-  <Box
-    display="flex"
-    justifyContent="space-between"
-    alignItems={{ xs: "stretch", md: "center" }}
-    flexDirection={{ xs: "column", md: "row" }}
-    gap={2}
-  >
-    {/* Left side controls */}
-    <Box
-      display="flex"
-      flexDirection={{ xs: "column", sm: "row" }}
-      alignItems={{ xs: "stretch", sm: "center" }}
-      gap={2}
-      flexWrap="wrap"
-      flex={1}
-    >
-      <TextField
-        label="Search by Name or SKU"
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        sx={{ minWidth: 230, flex: 1 }}
-      />
-
-      <FormControl sx={{ minWidth: 200 }}>
-        <InputLabel id="category-filter-label">Filter by Category</InputLabel>
-        <Select
-          labelId="category-filter-label"
-          value={selectedCategoryId}
-          label="Filter by Category"
-          onChange={(e) => setSelectedCategoryId(e.target.value)}
+      <Paper sx={{ p: 2 }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems={{ xs: "stretch", md: "center" }}
+          flexDirection={{ xs: "column", md: "row" }}
+          gap={2}
         >
-          <MenuItem value="">All Categories</MenuItem>
-          {categories.map((category) => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+          {/* Left side controls */}
+          <Box
+            display="flex"
+            flexDirection={{ xs: "column", sm: "row" }}
+            alignItems={{ xs: "stretch", sm: "center" }}
+            gap={2}
+            flexWrap="wrap"
+            flex={1}
+          >
+            <TextField
+              label="Search by Name or SKU"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              sx={{ minWidth: 230, flex: 1 }}
+            />
 
-      <FormControl sx={{ minWidth: 200 }}>
-        <InputLabel id="supplier-filter-label">Filter by Supplier</InputLabel>
-        <Select
-          labelId="supplier-filter-label"
-          value={selectedSupplierId}
-          label="Filter by Supplier"
-          onChange={(e) => setSelectedSupplierId(e.target.value)}
-        >
-          <MenuItem value="">All Suppliers</MenuItem>
-          {suppliers.map((supplier) => (
-            <MenuItem key={supplier.id} value={supplier.id}>
-              {supplier.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel id="category-filter-label">Filter by Category</InputLabel>
+              <Select
+                labelId="category-filter-label"
+                value={selectedCategoryId}
+                label="Filter by Category"
+                onChange={(e) => setSelectedCategoryId(e.target.value)}
+              >
+                <MenuItem value="">All Categories</MenuItem>
+                {categories.map((category) => (
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-      <FormControl sx={{ minWidth: 180 }}>
-        <InputLabel id="sort-label">Sort</InputLabel>
-        <Select
-          labelId="sort-label"
-          value={sortBy}
-          label="Sort"
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <MenuItem value="">Default</MenuItem>
-          <MenuItem value="name-asc">Name A-Z</MenuItem>
-          <MenuItem value="name-desc">Name Z-A</MenuItem>
-          <MenuItem value="price-asc">Price Low-High</MenuItem>
-          <MenuItem value="price-desc">Price High-Low</MenuItem>
-        </Select>
-      </FormControl>
-    </Box>
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel id="supplier-filter-label">Filter by Supplier</InputLabel>
+              <Select
+                labelId="supplier-filter-label"
+                value={selectedSupplierId}
+                label="Filter by Supplier"
+                onChange={(e) => setSelectedSupplierId(e.target.value)}
+              >
+                <MenuItem value="">All Suppliers</MenuItem>
+                {suppliers.map((supplier) => (
+                  <MenuItem key={supplier.id} value={supplier.id}>
+                    {supplier.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-    {/* Right side reset button */}
-    <Box
-      display="flex"
-      justifyContent={{ xs: "stretch", md: "flex-end" }}
-      alignItems="center"
-    >
-      <Button
-        variant="outlined"
-        onClick={handleResetFilters}
-        sx={{ minWidth: 120, height: 56 }}
-      >
-        Reset
-      </Button>
-    </Box>
-  </Box>
-</Paper>
+            <FormControl sx={{ minWidth: 180 }}>
+              <InputLabel id="sort-label">Sort</InputLabel>
+              <Select
+                labelId="sort-label"
+                value={sortBy}
+                label="Sort"
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <MenuItem value="">Default</MenuItem>
+                <MenuItem value="name-asc">Name A-Z</MenuItem>
+                <MenuItem value="name-desc">Name Z-A</MenuItem>
+                <MenuItem value="price-asc">Price Low-High</MenuItem>
+                <MenuItem value="price-desc">Price High-Low</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+
+          {/* Right side reset button */}
+          <Box
+            display="flex"
+            justifyContent={{ xs: "stretch", md: "flex-end" }}
+            alignItems="center"
+          >
+            <Button
+              variant="outlined"
+              onClick={handleResetFilters}
+              sx={{ minWidth: 120, height: 56 }}
+            >
+              Reset
+            </Button>
+          </Box>
+        </Box>
+      </Paper>
 
       {/* Products table */}
       <Paper sx={{ p: 2 }}>
@@ -344,61 +371,72 @@ const ProductsPage = () => {
             No products found.
           </Typography>
         ) : (
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>ID</strong></TableCell>
-                <TableCell><strong>Image</strong></TableCell>
-                <TableCell><strong>SKU</strong></TableCell>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Category</strong></TableCell>
-                <TableCell><strong>Supplier</strong></TableCell>
-                <TableCell><strong>Price</strong></TableCell>
-                <TableCell><strong>Qty</strong></TableCell>
-                <TableCell><strong>Reorder</strong></TableCell>
-                <TableCell><strong>Location</strong></TableCell>
-                <TableCell align="right"><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-
-            <TableBody>
-              {sortedProducts.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>{product.id}</TableCell>
-                  <TableCell>
-                    {product.image_url ? (
-                      <Box component="img" src={product.image_url} alt={product.name} 
-                      sx={{ width:50, height:50, objectFit: "cover", borderRadius:1, border: "1px solid #ddd" }} 
-                        onError={(e) => {e.currentTarget.style.display = "none"; }} /> 
-                    ): ("-")}
-                  </TableCell>
-                  <TableCell>{product.sku}</TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.category?.name || "-"}</TableCell>
-                  <TableCell>{product.supplier?.name || "-"}</TableCell>
-                  <TableCell>${product.price}</TableCell>
-                  <TableCell>{product.inventory?.quantity_on_hand ?? "-"}</TableCell>
-                  <TableCell>{product.inventory?.reorder_level ?? "-"}</TableCell>
-                  <TableCell>{product.inventory?.location || "-"}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenEdit(product)}
-                    >
-                      <EditIcon />
-                    </IconButton>
-
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDeleteProduct(product.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+          <>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>ID</strong></TableCell>
+                  <TableCell><strong>Image</strong></TableCell>
+                  <TableCell><strong>SKU</strong></TableCell>
+                  <TableCell><strong>Name</strong></TableCell>
+                  <TableCell><strong>Category</strong></TableCell>
+                  <TableCell><strong>Supplier</strong></TableCell>
+                  <TableCell><strong>Price</strong></TableCell>
+                  <TableCell><strong>Qty</strong></TableCell>
+                  <TableCell><strong>Reorder</strong></TableCell>
+                  <TableCell><strong>Location</strong></TableCell>
+                  <TableCell align="right"><strong>Actions</strong></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+
+              <TableBody>
+                {paginatedProducts.map((product) => (
+                  <TableRow key={product.id}>
+                    <TableCell>{product.id}</TableCell>
+                    <TableCell>
+                      {product.image_url ? (
+                        <Box component="img" src={product.image_url} alt={product.name} 
+                        sx={{ width:50, height:50, objectFit: "cover", borderRadius:1, border: "1px solid #ddd" }} 
+                          onError={(e) => {e.currentTarget.style.display = "none"; }} /> 
+                      ): ("-")}
+                    </TableCell>
+                    <TableCell>{product.sku}</TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.category?.name || "-"}</TableCell>
+                    <TableCell>{product.supplier?.name || "-"}</TableCell>
+                    <TableCell>${product.price}</TableCell>
+                    <TableCell>{product.inventory?.quantity_on_hand ?? "-"}</TableCell>
+                    <TableCell>{product.inventory?.reorder_level ?? "-"}</TableCell>
+                    <TableCell>{product.inventory?.location || "-"}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleOpenEdit(product)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDeleteProduct(product.id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+              {/* Pagination controls */}
+            <TablePagination component="div" 
+              count={sortedProducts.length} 
+              page={page} 
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[1,5,10,25]}
+            />
+          </>
         )}
       </Paper>
 
