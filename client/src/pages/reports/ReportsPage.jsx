@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { Alert, Box, Grid, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import Inventory2Icon from "@mui/icons-material/Inventory2";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
 import Loader from "../../components/common/Loader";
 import MovementTypeBadge from "../../components/common/MovementTypeBadge";
@@ -54,19 +50,6 @@ const ReportsPage = () => {
     fetchReportsData();
   }, []);
 
-  // Summary card values
-  const summaryCards = useMemo(() => {
-    return {
-      stockMovementCount: stockMovements.length,
-      inventoryCount: inventorySummary.length,
-      lowStockCount: lowStockItems.length,
-      totalInventoryQty: inventorySummary.reduce(
-        (sum, item) => sum + Number(item.quantity_on_hand || 0),
-        0
-      ),
-    };
-  }, [stockMovements, inventorySummary, lowStockItems]);
-
   // Chart data
   const chartData = useMemo(() => {
     return [
@@ -99,41 +82,6 @@ const ReportsPage = () => {
 
       {/* Error state */}
       {error && <Alert severity="error">{error}</Alert>}
-
-      {/* Top summary cards */}
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
-          <DashboardCard
-            title="Stock Movements"
-            value={summaryCards.stockMovementCount}
-            icon={<SwapHorizIcon fontSize="inherit" />}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <DashboardCard
-            title="Inventory Records"
-            value={summaryCards.inventoryCount}
-            icon={<Inventory2Icon fontSize="inherit" />}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <DashboardCard
-            title="Low Stock Items"
-            value={summaryCards.lowStockCount}
-            icon={<WarningAmberIcon fontSize="inherit" />}
-          />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <DashboardCard
-            title="Total Inventory Qty"
-            value={summaryCards.totalInventoryQty}
-            icon={<AssessmentIcon fontSize="inherit" />}
-          />
-        </Grid>
-      </Grid>
 
       {/* Chart section */}
       <ReportBarChart data={chartData} />
