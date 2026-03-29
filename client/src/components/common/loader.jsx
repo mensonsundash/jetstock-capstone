@@ -1,6 +1,6 @@
 import { Box, CircularProgress } from "@mui/material";
 
-// smooth MUI page loader 
+// Reusable smooth MUI page loader 
 const Loader = () => {
     return(
         <Box 

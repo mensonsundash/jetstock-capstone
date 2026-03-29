@@ -13,13 +13,7 @@ import { getAllSuppliers } from "../../api/supplierApi";
 import useDebounce from "../../hooks/useDebounce";
 
 // Products page
-// Handles:
-// - product listing
-// - create / update / delete
-// - search
-// - category filter
-// - supplier filter
-// - client-side sorting
+// Handles: - product listing, create / update / delete, server-side: search, category/supplier filter, client-side: sorting
 const ProductsPage = () => {
   // Main product data
   const [products, setProducts] = useState([]);
