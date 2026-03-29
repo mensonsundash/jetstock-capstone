@@ -11,6 +11,7 @@ import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../
 import { getAllCategories } from "../../api/categoryApi";
 import { getAllSuppliers } from "../../api/supplierApi";
 import useDebounce from "../../hooks/useDebounce";
+import { useToast } from "../../hooks/useToast";
 
 // Products page
 // Handles: - product listing, create / update / delete, server-side: search, category/supplier filter, client-side: sorting
@@ -29,6 +30,9 @@ const ProductsPage = () => {
   // Dialog state
   const [openForm, setOpenForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Global toast helpers
+  const { showSuccess, showError } = useToast();
 
   // Search / filter / sort state
   const [searchText, setSearchText] = useState("");
@@ -156,10 +160,10 @@ const ProductsPage = () => {
 
       if (selectedProduct) {
         await updateProduct(selectedProduct.id, payload);
-        setSuccess("Product updated successfully");
+        showSuccess("Product updated successfully");
       } else {
         await createProduct(payload);
-        setSuccess("Product created successfully");
+        showSuccess("Product created successfully");
       }
 
       handleCloseForm();
@@ -169,7 +173,9 @@ const ProductsPage = () => {
               supplierId: selectedSupplierId
             });
     } catch (error) {
-      setError(error?.response?.data?.message || "Failed to save product");
+      const message = error?.response?.data?.message || "Failed to save product";
+      setError(message);
+      showError(message);
       throw error;
     } finally {
       setSubmitting(false);
@@ -189,14 +195,16 @@ const ProductsPage = () => {
       setSuccess("");
 
       await deleteProduct(id);
-      setSuccess("Product deleted successfully");
+      showSuccess("Product deleted successfully");
       await fetchAllProductsData({
               q: debouncedSearchText,
               categoryId: selectedCategoryId,
               supplierId: selectedSupplierId
             });
     } catch (error) {
-      setError(error?.response?.data?.message || "Failed to delete product");
+      const message = error?.response?.data?.message || "Failed to delete product";
+      setError(message);
+      showError(message);
     }
   };
 

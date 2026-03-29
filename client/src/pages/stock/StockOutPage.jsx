@@ -5,6 +5,7 @@ import Loader from "../../components/common/Loader";
 import StockOutForm from "../../components/forms/StockOutForm";
 import { getAllProducts } from "../../api/productApi";
 import { stockOutProduct } from "../../api/stockMovementApi";
+import { useToast } from "../../hooks/useToast";
 
 // Stock Out page
 // Loads products and allows stock quantity decrease
@@ -14,6 +15,9 @@ const StockOutPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  // Global toast helpers
+  const { showSuccess, showError } = useToast();
 
   // Load products for dropdown
   const fetchProducts = async () => {
@@ -43,9 +47,11 @@ const StockOutPage = () => {
       setSuccess("");
 
       await stockOutProduct(payload);
-      setSuccess("Stock out recorded successfully");
+      showSuccess("Stock out recorded successfully");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to save stock out");
+      const message = err?.response?.data?.message || "Failed to save stock out";
+      setError(message);
+      showError(message);
       throw err;
     } finally {
       setSubmitting(false);

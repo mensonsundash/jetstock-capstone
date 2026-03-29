@@ -2,6 +2,7 @@ import { Alert, Box, Button, Paper, Stack, TextField, Typography } from "@mui/ma
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
+import { useToast } from "../../hooks/useToast";
 
 // login page
 const LoginPage = () => {
@@ -17,6 +18,9 @@ const LoginPage = () => {
   // UI state
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Global toast helpers
+  const { showError } = useToast();
 
   // updating form fields
   const handleChange = (e) => {
@@ -36,7 +40,9 @@ const LoginPage = () => {
       await login(formData.email, formData.password);
       navigate("/dashboard");
     } catch(error) {
-      setError(error.response.data.message || "Login failed")
+      const message = error.response.data.message || "Login failed";
+      setError(message);
+      showError(message);
     } finally {
       setSubmitting(false);
     }
@@ -54,11 +60,11 @@ const LoginPage = () => {
         <Typography variant="h5" mb={3}>Login to JetStock</Typography>
         
         {/* showing error messages */}
-        {error && (
+        {/* {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
-        )}
+        )} */}
 
         <Box component="form" onSubmit={handleSubmit}>
           <Stack spacing={2}>

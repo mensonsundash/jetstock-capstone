@@ -2,6 +2,7 @@ import { Alert, Box, Button, Paper, Stack, TextField, Typography } from "@mui/ma
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useState } from "react";
+import { useToast } from "../../hooks/useToast";
 
 // Registration page
 const RegisterPage = () => {
@@ -25,6 +26,9 @@ const RegisterPage = () => {
     const [success, setSuccess] = useState("");
     const [submitting, setSubmitting] = useState(false);
 
+    // Global toast helpers
+    const { showSuccess, showError } = useToast();
+
     // Update form fields
     const handleChange = (e) => {
       const { name, value } = e.target;
@@ -43,10 +47,12 @@ const RegisterPage = () => {
 
       try {
         await register(formData);
-        setSuccess("Registration successful. You can now log in.");
+        showSuccess("Registration successful. You can now log in.");
         setTimeout(() => navigate("/login"), 1000);
       } catch (error) {
-        setError(error.response.data.message || "Registration failed");
+        const message = error.response.data.message || "Registration failed";
+        setError(message);
+        showError(message);
       } finally {
         setSubmitting(false);
       }
@@ -65,18 +71,18 @@ const RegisterPage = () => {
         </Typography>
         
         {/* showing error messages */}
-        {error && (
+        {/* {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
-        )}
+        )} */}
 
          {/* showing success messages */}
-        {success && (
+        {/* {success && (
           <Alert severity="success" sx={{ mb: 2 }}>
             {success}
           </Alert>
-        )}
+        )} */}
 
         {/* Registration form */}
         <Box component="form" onSubmit={handleSubmit}>

@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Loader from "../../components/common/Loader";
 import SupplierForm from "../../components/forms/SupplierForm";
 import { getAllSuppliers, createSupplier, updateSupplier, deleteSupplier, } from "../../api/supplierApi";
+import { useToast } from "../../hooks/useToast";
 
 
 // Suppliers page: Show supplier list and handle create, update, delete operations
@@ -19,6 +20,9 @@ const SuppliersPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Global toast helpers
+  const { showSuccess, showError } = useToast();
 
   // Dialog state
   const [openForm, setOpenForm] = useState(false);
@@ -77,16 +81,18 @@ const SuppliersPage = () => {
       // with payload send to api
       if (selectedSupplier) {
         await updateSupplier(selectedSupplier.id, payload);
-        setSuccess("Supplier updated successfully");
+        showSuccess("Supplier updated successfully");
       } else {
         await createSupplier(payload);
-        setSuccess("Supplier created successfully");
+        showSuccess("Supplier created successfully");
       }
 
       handleCloseForm();
       await fetchSuppliers();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to save supplier");
+      const message = err?.response?.data?.message || "Failed to save supplier";
+      setError(message);
+      showError(message);
       throw err;
     } finally {
       setSubmitting(false);
@@ -106,10 +112,12 @@ const SuppliersPage = () => {
       setSuccess("");
 
       await deleteSupplier(id);
-      setSuccess("Supplier deleted successfully");
+      showSuccess("Supplier deleted successfully");
       await fetchSuppliers();
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete supplier");
+      const message = err?.response?.data?.message || "Failed to delete supplier";
+      setError(message);
+      showError(message);
     }
   };
 

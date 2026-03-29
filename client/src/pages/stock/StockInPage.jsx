@@ -5,6 +5,7 @@ import Loader from "../../components/common/Loader";
 import StockInForm from "../../components/forms/StockInForm";
 import { getAllProducts } from "../../api/productApi";
 import { stockInProduct } from "../../api/stockMovementApi";
+import { useToast } from "../../hooks/useToast";
 
 // Stock In page
 // Loads products and allows stock quantity increase
@@ -14,6 +15,9 @@ const StockInPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+
+  // Global toast helpers
+  const { showSuccess, showError } = useToast();
 
   // Load products for product dropdown
   const fetchProducts = async () => {
@@ -43,9 +47,11 @@ const StockInPage = () => {
       setSuccess("");
 
       await stockInProduct(payload);
-      setSuccess("Stock in recorded successfully");
+      showSuccess("Stock in recorded successfully");
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to save stock in");
+      const message = err?.response?.data?.message || "Failed to save stock in";
+      setError(message);
+      showError(message);
       throw err;
     } finally {
       setSubmitting(false);
