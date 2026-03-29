@@ -1,20 +1,27 @@
-import { Alert, Box, Button, IconButton, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Alert, Box, Button, FormControl, Grid, IconButton, InputLabel, MenuItem, Paper, Select, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import Loader from "../../components/common/Loader";
-import ProductForm from "../../components/forms/ProductFrom";
+import ProductForm from "../../components/forms/ProductForm";
 import { getAllProducts, createProduct, updateProduct, deleteProduct } from "../../api/productApi";
 import { getAllCategories } from "../../api/categoryApi";
 import { getAllSuppliers } from "../../api/supplierApi";
+import useDebounce from "../../hooks/useDebounce";
 
 // Products page
-// Handles product listing and CRUD actions
+// Handles:
+// - product listing
+// - create / update / delete
+// - search
+// - category filter
+// - supplier filter
+// - client-side sorting
 const ProductsPage = () => {
-  // Product data
+  // Main product data
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
@@ -29,33 +36,100 @@ const ProductsPage = () => {
   const [openForm, setOpenForm] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  // Load products + dropdown data
-  const fetchProductsPageData = async () => {
+  // Search / filter / sort state
+  const [searchText, setSearchText] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [selectedSupplierId, setSelectedSupplierId] = useState("");
+  const [sortBy, setSortBy] = useState("");
+
+  // debounced search text : this value only changes after the user stops typing
+  const debouncedSearchText = useDebounce(searchText.trim(), 500);
+
+  // Load categories and suppliers for dropdowns
+  const fetchReferenceData = async () => {
+    const [categoriesResponse, suppliersResponse] = await Promise.all([
+      getAllCategories(),
+      getAllSuppliers(),
+    ]);
+
+    setCategories(categoriesResponse?.data || []);
+    setSuppliers(suppliersResponse?.data || []);
+  };
+
+  // Load all products initially
+  const fetchAllProductsData = async ({
+    q ="",
+    categoryId ="",
+    supplierId = ""
+  } = {}) => {
     try {
       setLoading(true);
       setError("");
 
-      const [productsResponse, categoriesResponse, suppliersResponse] =
-        await Promise.all([
-          getAllProducts(),
-          getAllCategories(),
-          getAllSuppliers(),
-        ]);
-
-      setProducts(productsResponse?.data || []);
-      setCategories(categoriesResponse?.data || []);
-      setSuppliers(suppliersResponse?.data || []);
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to load products");
+      const response = await getAllProducts({
+        q,
+        categoryId,
+        supplierId
+      });
+      setProducts(response.data || []);
+    } catch (error) {
+      setError(error?.response?.data?.message || "Failed to load products");
     } finally {
       setLoading(false);
     }
   };
 
-  // Load on mount
+  // Initial page load
   useEffect(() => {
-    fetchProductsPageData();
+    const loadInitialData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        await fetchReferenceData();
+        await fetchAllProductsData({
+                q: debouncedSearchText,
+                categoryId: selectedCategoryId,
+                supplierId: selectedSupplierId
+              });
+      } catch (error) {
+        setError(error?.response?.data?.message || "Failed to load products page");
+        setLoading(false);
+      }
+    };
+
+    loadInitialData();
   }, []);
+
+  // SEARCH/FILTER: Search/filter effect runs everytime event changes
+  useEffect(() => {
+    fetchAllProductsData({
+      q: debouncedSearchText,
+      categoryId: selectedCategoryId,
+      supplierId: selectedSupplierId
+    });
+  }, [debouncedSearchText, selectedCategoryId, selectedSupplierId]);
+
+  // SORT: Apply client-side sort to the currently loaded product list
+  const sortedProducts = useMemo(() => {
+    const clonedProducts = [...products];
+
+    switch (sortBy) {
+      case "name-asc":
+        return clonedProducts.sort((a, b) => a.name.localeCompare(b.name));
+
+      case "name-desc":
+        return clonedProducts.sort((a, b) => b.name.localeCompare(a.name));
+
+      case "price-asc":
+        return clonedProducts.sort((a, b) => Number(a.price) - Number(b.price));
+
+      case "price-desc":
+        return clonedProducts.sort((a, b) => Number(b.price) - Number(a.price));
+
+      default:
+        return clonedProducts;
+    }
+  }, [products, sortBy]);
 
   // Open create form
   const handleOpenCreate = () => {
@@ -73,7 +147,7 @@ const ProductsPage = () => {
     setSuccess("");
   };
 
-  // Close form dialog
+  // Close dialog
   const handleCloseForm = () => {
     setOpenForm(false);
     setSelectedProduct(null);
@@ -95,10 +169,14 @@ const ProductsPage = () => {
       }
 
       handleCloseForm();
-      await fetchProductsPageData();
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to save product");
-      throw err;
+      await fetchAllProductsData({
+              q: debouncedSearchText,
+              categoryId: selectedCategoryId,
+              supplierId: selectedSupplierId
+            });
+    } catch (error) {
+      setError(error?.response?.data?.message || "Failed to save product");
+      throw error;
     } finally {
       setSubmitting(false);
     }
@@ -118,10 +196,22 @@ const ProductsPage = () => {
 
       await deleteProduct(id);
       setSuccess("Product deleted successfully");
-      await fetchProductsPageData();
-    } catch (err) {
-      setError(err?.response?.data?.message || "Failed to delete product");
+      await fetchAllProductsData({
+              q: debouncedSearchText,
+              categoryId: selectedCategoryId,
+              supplierId: selectedSupplierId
+            });
+    } catch (error) {
+      setError(error?.response?.data?.message || "Failed to delete product");
     }
+  };
+
+  // Reset all search / filter / sort values
+  const handleResetFilters = async () => {
+    setSearchText("");
+    setSelectedCategoryId("");
+    setSelectedSupplierId("");
+    setSortBy("");
   };
 
   if (loading) {
@@ -148,13 +238,106 @@ const ProductsPage = () => {
         </Button>
       </Box>
 
-      {/* Feedback */}
+      {/* Feedback messages */}
       {error && <Alert severity="error">{error}</Alert>}
       {success && <Alert severity="success">{success}</Alert>}
 
+      {/* Search / filter / sort controls */}
+<Paper sx={{ p: 2 }}>
+  <Box
+    display="flex"
+    justifyContent="space-between"
+    alignItems={{ xs: "stretch", md: "center" }}
+    flexDirection={{ xs: "column", md: "row" }}
+    gap={2}
+  >
+    {/* Left side controls */}
+    <Box
+      display="flex"
+      flexDirection={{ xs: "column", sm: "row" }}
+      alignItems={{ xs: "stretch", sm: "center" }}
+      gap={2}
+      flexWrap="wrap"
+      flex={1}
+    >
+      <TextField
+        label="Search by Name or SKU"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        sx={{ minWidth: 230, flex: 1 }}
+      />
+
+      <FormControl sx={{ minWidth: 200 }}>
+        <InputLabel id="category-filter-label">Filter by Category</InputLabel>
+        <Select
+          labelId="category-filter-label"
+          value={selectedCategoryId}
+          label="Filter by Category"
+          onChange={(e) => setSelectedCategoryId(e.target.value)}
+        >
+          <MenuItem value="">All Categories</MenuItem>
+          {categories.map((category) => (
+            <MenuItem key={category.id} value={category.id}>
+              {category.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl sx={{ minWidth: 200 }}>
+        <InputLabel id="supplier-filter-label">Filter by Supplier</InputLabel>
+        <Select
+          labelId="supplier-filter-label"
+          value={selectedSupplierId}
+          label="Filter by Supplier"
+          onChange={(e) => setSelectedSupplierId(e.target.value)}
+        >
+          <MenuItem value="">All Suppliers</MenuItem>
+          {suppliers.map((supplier) => (
+            <MenuItem key={supplier.id} value={supplier.id}>
+              {supplier.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      <FormControl sx={{ minWidth: 180 }}>
+        <InputLabel id="sort-label">Sort</InputLabel>
+        <Select
+          labelId="sort-label"
+          value={sortBy}
+          label="Sort"
+          onChange={(e) => setSortBy(e.target.value)}
+        >
+          <MenuItem value="">Default</MenuItem>
+          <MenuItem value="name-asc">Name A-Z</MenuItem>
+          <MenuItem value="name-desc">Name Z-A</MenuItem>
+          <MenuItem value="price-asc">Price Low-High</MenuItem>
+          <MenuItem value="price-desc">Price High-Low</MenuItem>
+        </Select>
+      </FormControl>
+    </Box>
+
+    {/* Right side reset button */}
+    <Box
+      display="flex"
+      justifyContent={{ xs: "stretch", md: "flex-end" }}
+      alignItems="center"
+    >
+      <Button
+        variant="outlined"
+        onClick={handleResetFilters}
+        sx={{ minWidth: 120, height: 56 }}
+      >
+        Reset
+      </Button>
+    </Box>
+  </Box>
+</Paper>
+
       {/* Products table */}
       <Paper sx={{ p: 2 }}>
-        {products.length === 0 ? (
+        {sortedProducts.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No products found.
           </Typography>
@@ -176,7 +359,7 @@ const ProductsPage = () => {
             </TableHead>
 
             <TableBody>
-              {products.map((product) => (
+              {sortedProducts.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>{product.id}</TableCell>
                   <TableCell>{product.sku}</TableCell>

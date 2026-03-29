@@ -1,8 +1,8 @@
 import axiosClient from "./axiosClient"
 
-// Fetch all products from backend
-export const getAllProducts = async () => {
-    const response = await axiosClient.get("/products");
+// Fetch all products from backend including query parameter for searching/filtering
+export const getAllProducts = async (params = {}) => {
+    const response = await axiosClient.get("/products", { params });
     return response.data;
 }
 
