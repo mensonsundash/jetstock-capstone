@@ -2,18 +2,37 @@ const { Op } = require('sequelize');
 const Models  = require('../models');
 
 /**
- * Function to get all products list
+ * Function to get all products list with searching & filters options
  */
 const getAllProducts = async (req, res) => {
     try{
-        // loggedin user data only
-        const {id, role} = req.user;
+        const { q ="", categoryId="", supplierId="" } = req.query; // query to get search/filters values
+        const {id, role} = req.user; // loggedin user data only
+
+        // non-admin user can only see only their own
         let whereClause = {};
         if(role !== 'admin') whereClause.user_id = id;
 
+        // seach by product name and sku where clause
+        if(q.trim()) {
+            whereClause[Op.or] = [
+                { name: { [Op.like]: `%${q.trim()}%` } },
+                { sku: { [Op.like]: `%${q.trim()}%` } },
+            ]
+        }
+
+        // filter by category
+        if(categoryId) {
+            whereClause.category_id = categoryId;
+        }
+        // filter by supplier
+        if(supplierId) {
+            whereClause.supplier_id = supplierId;
+        }   
+
         // fetching product table and joining related table with alias as: supplier, category & inventory 
         const products = await Models.Product.findAll({
-            where: whereClause,
+            where: {...whereClause},
             include:[
                 { model: Models.Supplier, as: "supplier" },
                 { model: Models.Category, as: "category" },
@@ -172,117 +191,10 @@ const deleteProduct = async (req, res) => {
     }
 }
 
-/**
- * Search products function by search keyword
- */
-const searchProducts = async (req, res) => {
-    try{
-        const { q } = req.query;
-        // loggedin user data only
-        const {id, role} = req.user;
-        let whereClause = {};
-        if(role !== 'admin') whereClause.user_id = id;
-
-        // fetching product table and joining related table with alias as: supplier, category & inventory 
-        // where condition sequelize sql query 
-        // or: One of the condition should match
-        // like: SQL Like to match query keyword from anywhere 
-        const products = await Models.Product.findAll({
-            where: {
-                [Op.and]: [
-                    whereClause,
-                    {
-                        [Op.or]: [
-                            {name: { [Op.like]: `%${q}%` } },
-                            {sku: { [Op.like]: `%${q}%` } },
-                        ]
-                    }
-                ]
-                
-            },
-            include:[
-                { model: Models.Supplier, as: "supplier" },
-                { model: Models.Category, as: "category" },
-                { model: Models.Inventory, as: "inventory" },
-            ]
-        });// using sequelize model findAll function to fetch with include feature to join another tables
-
-        
-        // checking if product not exist and stop : Code 404: Not Found
-        if(!products) return res.status(404).json({ message: "Product not found"})
-
-        
-        res.status(200).json({message: 'Searched Products successfully', data: products});
-
-    } catch(error) {
-        //Error Response: with status code and json error message
-        res.status(500).json({ message: 'Failed to search products', error: error.message })
-    }
-}
-
-/**
- * get products function by category
- */
-const getProductsByCategory = async (req, res) => {
-    try {
-        const {categoryId} = req.params;
-
-        // loggedin user data only
-        const {id, role} = req.user;
-        let whereClause = {};
-        if(role !== 'admin') whereClause.user_id = id;
-
-        const products = await Models.Product.findAll({
-            where: { whereClause, category_id: categoryId },
-            include: [
-                { model: Models.Inventory, as: "inventory" }
-            ],
-        });
-
-        // checking if product not exist and stop : Code 404: Not Found
-        if(!products) return res.status(404).json({ message: "Product not found"})
-
-        
-        res.status(200).json({message: 'Products fetched successfully', data: products});
-    } catch (error) {
-        //Error Response: with status code and json error message
-        res.status(500).json({ message: 'Failed to get products', error: error.message })
-    }
-};
-
-const getProductsBySupplier = async (req, res) => {
-    try {
-        const {supplierId} = req.params;
-        
-        // loggedin user data only
-        const {id, role} = req.user;
-        let whereClause = {};
-        if(role !== 'admin') whereClause.user_id = id;
-
-        const products = await Models.Product.findAll({
-            where: { whereClause, supplier_id: supplierId },
-            include: [
-                { model: Models.Inventory, as: "inventory" }
-            ],
-        });
-
-    // checking if product not exist and stop : Code 404: Not Found
-        if(!products) return res.status(404).json({ message: "Product not found"})
-        
-        res.status(200).json({message: 'Products fetched successfully', data: products});
-    } catch (error) {
-        //Error Response: with status code and json error message
-        res.status(500).json({ message: 'Failed to get products', error: error.message })
-    }
-};
-
 // make available to import
 module.exports = {
     getAllProducts,
     getProductById,
-    searchProducts,
-    getProductsByCategory,
-    getProductsBySupplier,
     createProduct,
     updateProduct,
     deleteProduct
