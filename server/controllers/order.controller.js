@@ -18,7 +18,9 @@ const getAllOrders = async (req, res) => {
             include: [
                 { model: Models.Customer, as: 'customer'},
                 { model: Models.OrderItem, as: 'items', include:[
-                    {model: Models.Product, as: 'product'}
+                    {model: Models.Product, as: 'product', include:[
+                        {model: Models.User, as: "users", attributes:["id","first_name", "last_name", "business_name"]}
+                    ]}
                 ]}
             ],
             order: [["created_at", "DESC"]]
