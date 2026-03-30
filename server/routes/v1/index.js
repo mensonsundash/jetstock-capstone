@@ -18,4 +18,7 @@ app.use("/customers", require("./customer.routes")); // router to user routes
 app.use("/orders", require("./order.routes")); // router to user routes
 app.use("/reports", require("./report.routes")); // router to report routes
 
+//external client
+app.use("/store", require("./store.routes"));
+
 module.exports = app;

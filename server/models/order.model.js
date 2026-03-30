@@ -11,10 +11,6 @@ const Order = Sequelize.define("Order",
       autoIncrement: true,
       allowNull: false,
     },
-    user_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     customer_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
