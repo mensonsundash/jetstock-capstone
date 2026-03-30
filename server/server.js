@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 require("./config/db.config");
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.FRONTEND_URL, process.env.JETSTORE_URL],
     credentials: true
 }));
 // parse requests of content-type = application/json
