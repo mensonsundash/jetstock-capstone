@@ -195,12 +195,15 @@
 
                     <!-- Buttons -->
                     <div class="mt-auto pt-3 d-grid gap-2">
-                        <button class="btn btn-primary w-100" id="addToCart" type="button" data-product-id="">
+                        <!-- <button class="btn btn-primary w-100" id="addToCart" type="button" data-product-id=""> -->
+                        <button class="btn btn-primary w-100" data-role="add-to-cart" type="button" data-product-id="">
                             <i class="bi bi-bag-plus me-2"></i>
                             Add to cart
                         </button>
+                        
 
-                        <button class="btn btn-outline-secondary w-100" id="quickView" type="button" data-product-id="">
+                        <!-- <button class="btn btn-outline-secondary w-100" id="quickView" type="button" data-product-id=""> -->
+                        <button class="btn btn-outline-secondary w-100" data-role="quick-view" type="button" data-product-id="">
                             <i class="bi bi-eye me-2"></i>
                             View
                         </button>
@@ -236,6 +239,7 @@
      </template>
 
 </body>
+<script src="js/api.js"></script>
 <script src="js/script.js"></script>
 <script src="js/cart.js"></script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
