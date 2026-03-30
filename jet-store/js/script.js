@@ -20,172 +20,267 @@ const loader = document.getElementById("loader");
 const searchInput = document.getElementById("searchInput");
 const filterSelect = document.getElementById("filterSelect");
 const sortSelect = document.getElementById("sortSelect");
+const resetBtn = document.getElementById('resetBtn');
 
 
+// //fetch data from uri and render to UI
+// // fetch("https://fakestoreapi.com/products")
+// // fetch("https://fakerapi.it/api/v2/custom?_quantity=2000&_locale=en_US&uuid=iban&title=name&category=card_type&description=paragraph&price=vat&image=image")
+// fetch("https://dummyjson.com/products")
+// .then((response) => response.json())
+// .then((products) => {
+//     console.log(products)
+//     allProducts = products.products;
+//     filteredProducts = products.products;
 
-//fetch data from uri and render to UI
-// fetch("https://fakestoreapi.com/products")
-// fetch("https://fakerapi.it/api/v2/custom?_quantity=2000&_locale=en_US&uuid=iban&title=name&category=card_type&description=paragraph&price=vat&image=image")
-fetch("https://dummyjson.com/products")
-.then((response) => response.json())
-.then((products) => {
-    console.log(products)
-    allProducts = products.products;
-    filteredProducts = products.products;
+//     populateCategoryDropdown(allProducts);
 
-    populateCategoryDropdown(allProducts);
+//     renderData();
+// });
 
-    renderData();
-});
+// /**
+//  * returns resolved array data
+//  */
+// function getData() {
+//     return new Promise((resolve) => {
+//         //small loading delay for spinner visibility
+//         setTimeout(() => {
+//             resolve(filteredProducts);
+//         }, 500);
+//     });
+// }
 
-/**
- * returns resolved array data
- */
-function getData() {
-    return new Promise((resolve) => {
-        //small loading delay for spinner visibility
-        setTimeout(() => {
-            resolve(filteredProducts);
-        }, 500);
+    // Load products from JetStock backend
+    document.addEventListener("DOMContentLoaded", async () => {
+    await fetchStoreProducts();
     });
-}
+
+    // Fetch public products from backend store API
+    async function fetchStoreProducts() {
+    try {
+        loader.classList.remove("d-none");
+        productsList.innerHTML = "";
+
+        const result = await apiRequest("/store/products");
+
+        allProducts = result.data || [];
+        filteredProducts = [...allProducts];
+
+        populateCategoryDropdown(allProducts);
+        renderData();
+    } catch (error) {
+        productsList.innerHTML = `
+        <div class="col-12">
+            <div class="alert alert-danger">
+            ${error.message}
+            </div>
+        </div>
+        `;
+    } finally {
+        loader.classList.add("d-none");
+    }
+    }
 
 /**
- * 
- * add html template card
+ * Add one product card to UI
  */
-function addCard(data) {
-    const template = productTemplate.content.cloneNode(true);
+function addCard(product) {
+  const template = productTemplate.content.cloneNode(true);
 
-    const iconClass = getCategoryIcon(data.category);
+  const categoryName = product.category?.name || "default";
+  const iconClass = getCategoryIcon(categoryName.toLowerCase());
+  const stockQty = Number(product.inventory?.quantity_on_hand || 0);
 
-    template.querySelector("#productImage").src = data.images[0]; // thumbnail
-    template.querySelector("#productTitle").innerText = data.title;
-    template.querySelector("#availabilityStatus").innerText = data.availabilityStatus;
-    template.querySelector("#availabilityStatus").classList = data.availabilityStatus == 'In Stock' ? "text-success" : "text-warning"; 
-    template.querySelector("#productCategory").innerHTML = `<i class="bi ${iconClass} me-2"></i>${data.category}`;
-    template.querySelector("#productPrice").innerText = data.price;
+  const imageEl = template.querySelector("#productImage");
+  imageEl.src = product.image_url || "";
+  imageEl.alt = product.name || "Product image";
 
-    //adding id into each button
-    template.querySelector("#addToCart").dataset.productId = data.id; // add dataset product-id on button
-    template.querySelector("#quickView").dataset.productId = data.id; // add dataset product-id on button
+  template.querySelector("#productTitle").innerText = product.name || "Untitled Product";
 
-    productsList.appendChild(template);
+  const availabilityEl = template.querySelector("#availabilityStatus");
+  availabilityEl.innerText = stockQty > 0 ? "In Stock" : "Out of Stock";
+  availabilityEl.classList =
+    stockQty > 0
+      ? "badge rounded-pill text-success px-3 py-2 availability-status"
+      : "badge rounded-pill text-warning px-3 py-2 availability-status";
+
+  template.querySelector("#productCategory").innerHTML = `
+    <i class="bi ${iconClass} me-2"></i>${categoryName}
+  `;
+
+  template.querySelector("#productPrice").innerText = `$${Number(product.price).toFixed(2)}`;
+
+  // Bind product id to buttons
+  const addBtn = template.querySelector('[data-role="add-to-cart"]') || template.querySelector("#addToCart");
+  const viewBtn = template.querySelector('[data-role="quick-view"]') || template.querySelector("#quickView");
+
+  addBtn.dataset.productId = product.id;
+  viewBtn.dataset.productId = product.id;
+
+  // Disable add-to-cart if out of stock
+  if (stockQty <= 0) {
+    addBtn.disabled = true;
+    addBtn.innerHTML = `<i class="bi bi-x-circle me-2"></i>Out of stock`;
+    addBtn.classList.remove("btn-primary");
+    addBtn.classList.add("btn-secondary");
+  }
+
+  productsList.appendChild(template);
 }
 
 /**
  * render all data: iterating array and calling addCard to create card for each value
  */
-function renderData () {
-    // show loader before loading data
-    loader.classList.remove("d-none");
+function renderData() {
+  loader.classList.remove("d-none");
+  productsList.innerHTML = "";
 
-    // clear all current items
-    productsList.innerHTML = "";
-    
-    //re-populate with latest array contents
-    getData().then((totalData) => {
+  if (filteredProducts.length === 0) {
+    productsList.innerHTML = `
+      <div class="col-12">
+        <div class="alert alert-light border text-center">
+          No products found.
+        </div>
+      </div>
+    `;
+    loader.classList.add("d-none");
+    return;
+  }
 
-        if(totalData.length === 0) {
-            productsList.innerHTML=`<p>No Products found</p>`
-            loader.classList.add("d-none");
-            return;
-        }
-
-            totalData.forEach((data) =>  addCard(data) );
-            //hide loader after rendering all data
-            loader.classList.add("d-none");
-        }
-    );
-}
-
-//get all the unique values from full array
-function getUniqueCategories(products){
-    //Set object witll create new set of unique mapped data
-    return [...new Set(products.map(p => p.category))];
-}
-
-//appending option child into select of filterSelect
-function populateCategoryDropdown(products){
-    filterSelect.innerHTML = `<option value="">Filter by Category</option>`;
-    const categories = getUniqueCategories(products);
-    console.log(categories)
-    categories.forEach(category => {
-        const option = document.createElement("option");
-        option.value= category;
-        option.textContent = category;
-        filterSelect.appendChild(option);
-    });
-}
-
-// function to get icon for category
-function getCategoryIcon(category) {
-    return categoryIconMap[category] || categoryIconMap['default']
-}
-
-// searching value on input provided to filter on title and category
-function searching(allProductsData, searchValue){
-    searchValue = searchValue.toLowerCase();
-    return allProductsData.filter((product) =>  product.title.toLowerCase().includes(searchValue) || product.category.toLowerCase().includes(searchValue) );
-}
-
-// filtering products on provided category matched
-function filtering(allProductsData, selectedCategory){
-    selectedCategory = selectedCategory.toLowerCase();
-    return selectedCategory ? allProductsData.filter((product) => product.category.toLowerCase() === selectedCategory) : allProductsData;
-}
-
-// sorting mechanism with asc & desc on price and name
-function sorting(data, sortValue){
-    sortValue = sortValue.toLowerCase();
-    switch (sortValue) {
-        case "price-asc":
-            return data.sort((a,b) => a.price - b.price);
-        case "price-desc":
-            return data.sort((a,b) => b.price-a.price);
-        case "name-asc":
-            return data.sort((a,b) => a.title > b.title ? 1 : -1 );
-        case "name-desc":
-            return data.sort((a,b) => b.title > a.title ? 1: -1);
-        default:
-            return data;
-    }
+  filteredProducts.forEach((product) => addCard(product));
+  loader.classList.add("d-none");
 }
 
 /**
- * function to control states of all query action together
+ * Build unique category list from backend products
+ */
+function getUniqueCategories(products) {
+  return [...new Set(products.map((p) => p.category?.name).filter(Boolean))];
+}
+
+/**
+ * Fill category dropdown
+ * //appending option child into select of filterSelect
+ */
+function populateCategoryDropdown(products) {
+  filterSelect.innerHTML = `<option value="">Filter by Category</option>`;
+
+  const categories = getUniqueCategories(products);
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    filterSelect.appendChild(option);
+  });
+}
+
+/**
+ * Return icon for category
+ */
+function getCategoryIcon(category) {
+  return categoryIconMap[category] || categoryIconMap.default;
+}
+
+/**
+ * Search by product name, description, or category
+ */
+function searching(products, searchValue) {
+  const query = searchValue.toLowerCase();
+
+  return products.filter((product) => {
+    const name = product.name?.toLowerCase() || "";
+    const description = product.description?.toLowerCase() || "";
+    const category = product.category?.name?.toLowerCase() || "";
+
+    return (
+      name.includes(query) ||
+      description.includes(query) ||
+      category.includes(query)
+    );
+  });
+}
+
+/**
+ * Filter by category
+ */
+function filtering(products, selectedCategory) {
+  const category = selectedCategory.toLowerCase();
+
+  return category
+    ? products.filter(
+        (product) => (product.category?.name || "").toLowerCase() === category
+      )
+    : products;
+}
+
+/**
+ * Sort by name or price
+ */
+function sorting(data, sortValue) {
+  const cloned = [...data];
+
+  switch (sortValue.toLowerCase()) {
+    case "price-asc":
+      return cloned.sort((a, b) => Number(a.price) - Number(b.price));
+
+    case "price-desc":
+      return cloned.sort((a, b) => Number(b.price) - Number(a.price));
+
+    case "name-asc":
+      return cloned.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+
+    case "name-desc":
+      return cloned.sort((a, b) => (b.name || "").localeCompare(a.name || ""));
+
+    default:
+      return cloned;
+  }
+}
+
+/**
+ * Apply search + filter + sort together
  */
 function applyFiltersAndSort() {
-    const query = searchInput.value.trim().toLowerCase();
-    const selectedCategory = filterSelect.value.trim().toLowerCase();
-    const sortValue = sortSelect.value.trim().toLowerCase();
-    
-    let result = [...allProducts]; //retaining original array
+  const query = searchInput.value.trim().toLowerCase();
+  const selectedCategory = filterSelect.value.trim().toLowerCase();
+  const sortValue = sortSelect.value.trim().toLowerCase();
 
-    //search filter
-    if(query){
-        result = searching(result, query)
-    }
+  let result = [...allProducts];
 
-    //category filter
-    if(selectedCategory){
-        result = filtering(result, selectedCategory);
-    }
+  if (query) {
+    result = searching(result, query);
+  }
 
-    //sort
-    if(sortValue){
-        result = sorting(result, sortValue)
-    }
+  if (selectedCategory) {
+    result = filtering(result, selectedCategory);
+  }
 
-    //updating working arrayy data and rendering
+  if (sortValue) {
+    result = sorting(result, sortValue);
+  }
+
+  //updating working arrayy data and rendering
     filteredProducts = result;
     renderData();
 }
+    
 
 // Events Listener for all input connecting to group function
 searchInput.addEventListener("input", applyFiltersAndSort);
 filterSelect.addEventListener("change", applyFiltersAndSort);
 sortSelect.addEventListener("change", applyFiltersAndSort);
+
+if (resetBtn) {
+  resetBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    filterSelect.value = "";
+    sortSelect.value = "";
+    filteredProducts = [...allProducts];
+    renderData();
+  });
+}
+
 
 
 
