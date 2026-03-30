@@ -15,8 +15,8 @@ async function init() {
     await Supplier.sync(); 
     await Category.sync();
     await Product.sync();
-    await Customer.sync();
-    await Order.sync();
+    await Customer.sync({alter: true});
+    await Order.sync({alter: true});
     await OrderItem.sync();
     await Inventory.sync();
     await StockMovement.sync();
@@ -37,14 +37,6 @@ async function init() {
     // User -> Product : One to Many relationship
     User.hasMany(Product, { foreignKey: "user_id", as: "products" });
     Product.belongsTo(User, { foreignKey: "user_id", as: "user" });
-
-    // User -> Customer : One to Many relationship
-    User.hasMany(Customer, { foreignKey: "user_id", as: "customers" });
-    Customer.belongsTo(User, { foreignKey: "user_id", as: "user" });
-
-    // User -> Order: One to Many relationship
-    User.hasMany(Order, { foreignKey: "user_id", as: "orders" });
-    Order.belongsTo(User, { foreignKey: "user_id", as: "user" });
 
     // User -> StockMovement: One to Many relationship
     User.hasMany(StockMovement, { foreignKey: "user_id", as: "stock_movements" });
