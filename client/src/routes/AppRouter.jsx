@@ -15,6 +15,7 @@ import StockOutPage from "../pages/stock/StockOutPage";
 import StockMovementPage from "../pages/stock/StockMovementPage";
 import ReportsPage from "../pages/reports/ReportsPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import OrdersPage from '../pages/orders/OrdersPage';
 
 // Router function for pages routing
 const AppRouter = () => {
@@ -42,6 +43,7 @@ const AppRouter = () => {
             <Route path="stock-in" element={<StockInPage />} />
             <Route path="stock-out" element={<StockOutPage />} />
             <Route path="stock-movements" element={<StockMovementPage />} />
+            <Route path='orders' element={<OrdersPage />} />
             <Route path="reports" element={<ReportsPage />} />
         </Route>
 
