@@ -12,52 +12,59 @@ const CART_KEY = "cart_storage";
 // cart state: { [productId]: { product: {...}, qty: number } }
 let cart = loadCart();
 
-// Product list click delegation
-productsList.addEventListener("click", (e) => {
-  const addBtn =
-    e.target.closest('[data-role="add-to-cart"]') ||
-    e.target.closest("#addToCart");
+// Product list click delegation — only on index page
+if (productsList) {
+  productsList.addEventListener("click", (e) => {
+    const addBtn =
+      e.target.closest('[data-role="add-to-cart"]') ||
+      e.target.closest("#addToCart");
 
-  const viewBtn =
-    e.target.closest('[data-role="quick-view"]') ||
-    e.target.closest("#quickView");
+    const viewBtn =
+      e.target.closest('[data-role="quick-view"]') ||
+      e.target.closest("#quickView");
 
-  if (addBtn) {
-    const id = Number(addBtn.dataset.productId);
-    addProductToCart(id);
-  }
+    if (addBtn) {
+      const id = Number(addBtn.dataset.productId);
+      addProductToCart(id);
+    }
 
-  if (viewBtn) {
-    const id = Number(viewBtn.dataset.productId);
-    goToDetailPage(id);
-  }
-});
+    if (viewBtn) {
+      const id = Number(viewBtn.dataset.productId);
+      goToDetailPage(id);
+    }
+  });
+}
 
-// Cart actions
-clearCartBtn.addEventListener("click", clearCart);
+// Cart actions — only on index page
+if (clearCartBtn) {
+  clearCartBtn.addEventListener("click", clearCart);
+}
 
-// For now, go to checkout page instead of alert
-checkoutBtn.addEventListener("click", () => {
-  window.location.href = "checkout.html";
-});
+if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", () => {
+    window.location.href = "checkout.html";
+  });
+}
 
 // Cart items click delegation
 const cartItemsContainer = document.getElementById("cartItems");
 
-cartItemsContainer.addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-action]");
-  if (!btn) return;
+if (cartItemsContainer) {
+  cartItemsContainer.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
 
-  const action = btn.dataset.action;
-  const card = btn.closest("[data-cart-id]");
-  if (!card) return;
+    const action = btn.dataset.action;
+    const card = btn.closest("[data-cart-id]");
+    if (!card) return;
 
-  const productId = Number(card.dataset.cartId);
+    const productId = Number(card.dataset.cartId);
 
-  if (action === "increase") changeCartQty(productId, +1);
-  if (action === "decrease") changeCartQty(productId, -1);
-  if (action === "remove") removeCartItem(productId);
-});
+    if (action === "increase") changeCartQty(productId, +1);
+    if (action === "decrease") changeCartQty(productId, -1);
+    if (action === "remove") removeCartItem(productId);
+  });
+}
 
 function loadCart() {
   try {
@@ -67,6 +74,16 @@ function loadCart() {
     console.error("Cart load failed:", err);
     return {};
   }
+}
+
+// Return cart items as array
+function getCartItemsArray() {
+  return Object.values(cart);
+}
+
+// Return raw cart object if needed
+function getCartObject() {
+  return cart;
 }
 
 function saveCart() {
@@ -86,6 +103,21 @@ function cartPriceTotal() {
   }, 0);
 }
 
+
+// Show a toast notification when a product is added
+function showCartToast(productName) {
+  const toastEl = document.getElementById("cartToast");
+  const toastMsg = document.getElementById("cartToastMsg");
+  if (!toastEl) return;
+ 
+  if (toastMsg) {
+    toastMsg.textContent = `"${productName}" added to cart!`;
+  }
+ 
+  const toast = bootstrap.Toast.getOrCreateInstance(toastEl);
+  toast.show();
+}
+
 // Add product into cart using product ID
 function addProductToCart(productId) {
   const product = allProducts.find((p) => p.id === productId);
@@ -100,6 +132,7 @@ function addProductToCart(productId) {
 
   saveCart();
   renderCartItems();
+  showCartToast(product.name || "Product")
 }
 
 // Update quantity
@@ -140,6 +173,8 @@ function clearCart() {
 
 // Render cart items
 function renderCartItems() {
+  if (!cartItemsContainer) return;
+
   cartItemsContainer.innerHTML = "";
 
   const items = Object.values(cart);
@@ -181,8 +216,8 @@ function renderCartItems() {
 
 // Update total count + total price
 function updateCartUI() {
-  cartCount.textContent = cartCountTotal();
-  cartTotal.textContent = cartPriceTotal().toFixed(2);
+  if (cartCount) cartCount.textContent = cartCountTotal();
+  if (cartTotal) cartTotal.textContent = cartPriceTotal().toFixed(2);
 }
 
 // Open detail page
