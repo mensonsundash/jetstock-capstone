@@ -8,6 +8,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import InputIcon from "@mui/icons-material/Input";
 import OutputIcon from "@mui/icons-material/Output";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import { NavLink } from "react-router-dom";
 
 // list of sidebar with its path and icon pack
@@ -20,6 +21,7 @@ const menuItems = [
   { text: "Stock In", path: "/stock-in", icon: <InputIcon /> },
   { text: "Stock Out", path: "/stock-out", icon: <OutputIcon /> },
   { text: "Stock Movements", path: "/stock-movements", icon: <SwapHorizIcon /> },
+  { text: "Orders", path: "/orders", icon: <ReceiptLongIcon /> },
   { text: "Reports", path: "/reports", icon: <AssessmentIcon /> },
 ];
 
