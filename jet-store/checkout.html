@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout - ShopFront</title>
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+</head>
+<body>
+  <!-- Top navbar -->
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container py-1">
+      <a class="navbar-brand fw-bold text-primary" href="./index.html">
+        <i class="bi bi-bag-check me-2"></i> ShopFront
+      </a>
+    </div>
+  </nav>
+
+  <!-- Checkout section -->
+  <section class="py-4">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Checkout form -->
+        <div class="col-12 col-lg-7">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h2 class="h4 fw-bold mb-3">Checkout</h2>
+              <p class="text-secondary">Enter your details to place your order.</p>
+
+              <div id="checkoutMessage"></div>
+
+              <form id="checkoutForm" class="mt-3">
+                <div class="mb-3">
+                  <label for="full_name" class="form-label">Full Name</label>
+                  <input type="text" class="form-control" id="full_name" required />
+                </div>
+
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" required />
+                </div>
+
+                <div class="mb-3">
+                  <label for="phone" class="form-label">Phone</label>
+                  <input type="text" class="form-control" id="phone" />
+                </div>
+
+                <div class="mb-3">
+                  <label for="address" class="form-label">Address</label>
+                  <textarea class="form-control" id="address" rows="3"></textarea>
+                </div>
+
+                <button type="submit" id="placeOrderBtn" class="btn btn-success">
+                  Place Order
+                </button>
+                <a href="./index.html" class="btn btn-outline-secondary ms-2">
+                  Continue Shopping
+                </a>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order summary -->
+        <div class="col-12 col-lg-5">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h3 class="h5 fw-bold mb-3">Order Summary</h3>
+
+              <div id="checkoutItems" class="d-flex flex-column gap-3"></div>
+
+              <hr />
+
+              <div class="d-flex justify-content-between">
+                <span class="text-secondary">Total</span>
+                <strong>$<span id="checkoutTotal">0.00</span></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="./js/api.js"></script>
+  <script src="./js/script.js"></script>
+  
+  <script src="./js/cart.js"></script>
+  <script src="./js/checkout.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
