@@ -14,12 +14,11 @@ const getAllOrders = async (req, res) => {
         // fetching order table and joining related table with alias as: customer, orderItem & 
         // nested table include inside orderItem as product
         const orders = await Models.Order.findAll({
-            where: whereClause,
             include: [
                 { model: Models.Customer, as: 'customer'},
                 { model: Models.OrderItem, as: 'items', include:[
-                    {model: Models.Product, as: 'product', include:[
-                        {model: Models.User, as: "users", attributes:["id","first_name", "last_name", "business_name"]}
+                    {model: Models.Product, as: 'product', where: whereClause, include:[
+                        {model: Models.User, as: "user", attributes:["id","first_name", "last_name", "business_name"]}
                     ]}
                 ]}
             ],
