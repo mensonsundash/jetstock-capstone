@@ -23,42 +23,17 @@ const sortSelect = document.getElementById("sortSelect");
 const resetBtn = document.getElementById('resetBtn');
 
 
-// //fetch data from uri and render to UI
-// // fetch("https://fakestoreapi.com/products")
-// // fetch("https://fakerapi.it/api/v2/custom?_quantity=2000&_locale=en_US&uuid=iban&title=name&category=card_type&description=paragraph&price=vat&image=image")
-// fetch("https://dummyjson.com/products")
-// .then((response) => response.json())
-// .then((products) => {
-//     console.log(products)
-//     allProducts = products.products;
-//     filteredProducts = products.products;
-
-//     populateCategoryDropdown(allProducts);
-
-//     renderData();
-// });
-
-// /**
-//  * returns resolved array data
-//  */
-// function getData() {
-//     return new Promise((resolve) => {
-//         //small loading delay for spinner visibility
-//         setTimeout(() => {
-//             resolve(filteredProducts);
-//         }, 500);
-//     });
-// }
-
     // Load products from JetStock backend
     document.addEventListener("DOMContentLoaded", async () => {
-    await fetchStoreProducts();
+    if (productsList) {
+        await fetchStoreProducts();
+    }
     });
 
     // Fetch public products from backend store API
     async function fetchStoreProducts() {
     try {
-        loader.classList.remove("d-none");
+        if (loader) loader.classList.remove("d-none");
         productsList.innerHTML = "";
 
         const result = await apiRequest("/store/products");
@@ -77,7 +52,7 @@ const resetBtn = document.getElementById('resetBtn');
         </div>
         `;
     } finally {
-        loader.classList.add("d-none");
+        if (loader) loader.classList.add("d-none");
     }
     }
 
@@ -132,7 +107,8 @@ function addCard(product) {
  * render all data: iterating array and calling addCard to create card for each value
  */
 function renderData() {
-  loader.classList.remove("d-none");
+  if (!productsList) return;
+  if (loader) loader.classList.remove("d-none");
   productsList.innerHTML = "";
 
   if (filteredProducts.length === 0) {
@@ -143,12 +119,12 @@ function renderData() {
         </div>
       </div>
     `;
-    loader.classList.add("d-none");
+    if (loader) loader.classList.add("d-none");
     return;
   }
 
   filteredProducts.forEach((product) => addCard(product));
-  loader.classList.add("d-none");
+  if (loader) loader.classList.add("d-none");
 }
 
 /**
@@ -163,6 +139,7 @@ function getUniqueCategories(products) {
  * //appending option child into select of filterSelect
  */
 function populateCategoryDropdown(products) {
+  if (!filterSelect) return;
   filterSelect.innerHTML = `<option value="">Filter by Category</option>`;
 
   const categories = getUniqueCategories(products);
@@ -260,16 +237,16 @@ function applyFiltersAndSort() {
     result = sorting(result, sortValue);
   }
 
-  //updating working arrayy data and rendering
+  //updating working array data and rendering
     filteredProducts = result;
     renderData();
 }
     
 
 // Events Listener for all input connecting to group function
-searchInput.addEventListener("input", applyFiltersAndSort);
-filterSelect.addEventListener("change", applyFiltersAndSort);
-sortSelect.addEventListener("change", applyFiltersAndSort);
+if (searchInput) searchInput.addEventListener("input", applyFiltersAndSort);
+if (filterSelect) filterSelect.addEventListener("change", applyFiltersAndSort);
+if (sortSelect) sortSelect.addEventListener("change", applyFiltersAndSort);
 
 if (resetBtn) {
   resetBtn.addEventListener("click", () => {
@@ -280,7 +257,3 @@ if (resetBtn) {
     renderData();
   });
 }
-
-
-
-
