@@ -1,6 +1,7 @@
 // VARIABLES UNIT
 let allProducts = [];//original array
 let filteredProducts = [];//working array
+let defaultImage = "assets/default.svg";// default image thumbnail
 const categoryIconMap = {
     "beauty": "bi-palette-fill",
     "fragrances": "bi-flower1",
@@ -67,7 +68,7 @@ function addCard(product) {
   const stockQty = Number(product.inventory?.quantity_on_hand || 0);
 
   const imageEl = template.querySelector("#productImage");
-  imageEl.src = product.image_url || "";
+  imageEl.src = product?.image_url || defaultImage;
   imageEl.alt = product.name || "Product image";
 
   template.querySelector("#productTitle").innerText = product.name || "Untitled Product";
