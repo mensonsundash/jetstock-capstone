@@ -18,17 +18,15 @@ const connectDB = async () => {
     try{    
         await sequelize.authenticate();
         console.log(`Successful connection to MySQL Database ${process.env.DB_NAME}`);
-
-        // await sequelize.sync();
-        // console.log('Database synchronized');
     }catch(error) {
         console.error("Unable to connect to MySQL database:", error.message);
-        process.exit(1);
+        if(process.env.NODE_ENV !== 'test') {
+            process.exit(1);
+        }
+
+        throw error;
     }
 
 }
 
-//calling function to connect DB
-connectDB();
-
-module.exports = {Sequelize: sequelize}
+module.exports = {Sequelize: sequelize, connectDB}

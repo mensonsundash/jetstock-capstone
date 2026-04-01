@@ -80,10 +80,11 @@ async function init() {
     OrderItem.hasMany(StockMovement, { foreignKey: "order_item_id", as: "stock_movements" });
     StockMovement.belongsTo(OrderItem, { foreignKey: "order_item_id", as: "order_items" });
 
-
-//calling initialization function to load all models
-init();
-
+// checking if node environemtn is not test: then stop direct db connect & model initialization
+if(process.env.NODE_ENV !== "test"){
+    //calling initialization function to load all models
+    init();
+}
 
 module.exports = {
     User,

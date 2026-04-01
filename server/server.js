@@ -1,14 +1,9 @@
 const express = require("express"); // importing express module
-const app = express(); // creating express app
-
-//dotenv config import before db connection
-require("dotenv").config();
-
 const cors = require("cors"); // importing cors module
-const PORT = process.env.PORT || 3000;
+require("dotenv").config(); // dotenv config import before db connection
 
-//help to connect database directly as connection function already called inside it
-require("./config/db.config");
+const app = express(); // creating express app
+const PORT = process.env.PORT || 3000;
 
 app.use(cors({
     origin: [process.env.FRONTEND_URL, process.env.JETSTORE_URL],
@@ -26,7 +21,37 @@ app.get("/", (req, res) => {
 //main api routes (path to all routes)
 app.use("/api", require("./routes"));
 
-//server is listening port
-app.listen(PORT, () => {
-    console.log(`App is listening on http:localhost: ${PORT}`);
-})
+// checking if node environemtn is not test
+if(process.env.NODE_ENV !== "test"){
+
+    //help to connect database directly as connection function already called inside it
+    const { connecDB } = require("./config/db.config");
+    
+    (async() => {
+        try{
+            //connecting db
+            await connecDB();
+
+             //server is listening port
+            app.listen(PORT, () => {
+                console.log(`App is listening on http:localhost: ${PORT}`);
+            })     
+
+        }catch(error) {
+            console.error(`Failed to start server:${error.message}`);
+            process.exit(1);
+        }
+    })();
+
+    //connecting db
+    connecDB().then(() => {
+        //server is listening port
+        app.listen(PORT, () => {
+            console.log(`App is listening on http:localhost: ${PORT}`);
+        })
+    });
+    
+}
+
+// exporting server & making available for tests
+module.exports = app;
