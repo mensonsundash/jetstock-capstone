@@ -43,14 +43,6 @@ if(process.env.NODE_ENV !== "test"){
         }
     })();
 
-    //connecting db
-    connecDB().then(() => {
-        //server is listening port
-        app.listen(PORT, () => {
-            console.log(`App is listening on http:localhost: ${PORT}`);
-        })
-    });
-    
 }
 
 // exporting server & making available for tests
