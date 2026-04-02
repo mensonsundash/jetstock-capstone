@@ -125,7 +125,7 @@ ERD diagram: [View on Draw.io](https://drive.google.com/file/d/1HupjjxbfYEgbygMS
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/[your-username]/jetstock.git
+git clone https://github.com/mensonsundash/jetstock.git
 cd jetstock
 ```
 
