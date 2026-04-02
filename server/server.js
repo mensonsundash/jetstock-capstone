@@ -25,12 +25,12 @@ app.use("/api", require("./routes"));
 if(process.env.NODE_ENV !== "test"){
 
     //help to connect database directly as connection function already called inside it
-    const { connecDB } = require("./config/db.config");
+    const { connectDB } = require("./config/db.config");
     
     (async() => {
         try{
             //connecting db
-            await connecDB();
+            await connectDB();
 
              //server is listening port
             app.listen(PORT, () => {
