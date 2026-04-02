@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkout - ShopFront</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/logo-icon.svg" />
+  <title>Checkout - JetStore</title>
 
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="./css/style.css" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
 </head>
@@ -13,9 +14,30 @@
   <!-- Top navbar -->
   <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
     <div class="container py-1">
-      <a class="navbar-brand fw-bold text-primary" href="./index.html">
-        <i class="bi bi-bag-check me-2"></i> ShopFront
+      <a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" href="./index.html">
+          <img src="./assets/logo.svg" alt="ShopFront Logo" width="36" height="36" class="object-fit-contain">
       </a>
+
+      <!-- Mobile toggler-->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"
+          aria-controls="topNav" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- navigation -->
+      <div class="collapse navbar-collapse" id="topNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                  <a class="nav-link active" href="./index.html">Products</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="assets/docs.pdf">Document</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="#About">About</a>
+              </li>
+          </ul>
+      </div>
     </div>
   </nav>
 

@@ -1,6 +1,7 @@
 // CART SYSTEM
 
 // DOM
+// const productsList = document.getElementById("productsList");
 const cartItemTemplate = document.getElementById("cartItemTemplate");
 const cartCount = document.getElementById("cartCount");
 const cartTotal = document.getElementById("cartTotal");
@@ -12,9 +13,10 @@ const CART_KEY = "cart_storage";
 // cart state: { [productId]: { product: {...}, qty: number } }
 let cart = loadCart();
 
-// Product list click delegation — only on index page
+// This runs only on pages where productsList exists
 if (productsList) {
   productsList.addEventListener("click", (e) => {
+    // Support both data-role selectors and old id selectors
     const addBtn =
       e.target.closest('[data-role="add-to-cart"]') ||
       e.target.closest("#addToCart");
@@ -23,17 +25,20 @@ if (productsList) {
       e.target.closest('[data-role="quick-view"]') ||
       e.target.closest("#quickView");
 
+    // Add product into cart
     if (addBtn) {
       const id = Number(addBtn.dataset.productId);
       addProductToCart(id);
     }
 
+    // Go to product details page
     if (viewBtn) {
       const id = Number(viewBtn.dataset.productId);
       goToDetailPage(id);
     }
   });
 }
+
 
 // Cart actions — only on index page
 if (clearCartBtn) {
@@ -42,13 +47,14 @@ if (clearCartBtn) {
 
 if (checkoutBtn) {
   checkoutBtn.addEventListener("click", () => {
-    window.location.href = "checkout.html";
+    const isInsidePagesFolder = window.location.pathname.includes("/pages/");
+    window.location.href = isInsidePagesFolder ? "../checkout.html" : "checkout.html";
   });
 }
 
-// Cart items click delegation
+// Cart items click delegation: Cart items wrapper inside offcanvas
 const cartItemsContainer = document.getElementById("cartItems");
-
+// Event delegation for increase / decrease / remove buttons
 if (cartItemsContainer) {
   cartItemsContainer.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-action]");
@@ -60,12 +66,14 @@ if (cartItemsContainer) {
 
     const productId = Number(card.dataset.cartId);
 
-    if (action === "increase") changeCartQty(productId, +1);
+    if (action === "increase") changeCartQty(productId, 1);
     if (action === "decrease") changeCartQty(productId, -1);
     if (action === "remove") removeCartItem(productId);
   });
 }
 
+/** STORAGE HELPERS */
+// Read cart from localStorage
 function loadCart() {
   try {
     const raw = localStorage.getItem(CART_KEY);
@@ -81,20 +89,23 @@ function getCartItemsArray() {
   return Object.values(cart);
 }
 
-// Return raw cart object if needed
+// Return raw cart object
 function getCartObject() {
   return cart;
 }
 
+// Save cart into localStorage
 function saveCart() {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
 
+// Total number of items in cart
 function cartCountTotal() {
   const items = Object.values(cart);
   return items.reduce((sum, item) => sum + item.qty, 0);
 }
 
+// Total price of cart
 function cartPriceTotal() {
   const items = Object.values(cart);
   return items.reduce((sum, item) => {
@@ -102,6 +113,7 @@ function cartPriceTotal() {
     return sum + price * item.qty;
   }, 0);
 }
+
 
 
 // Show a toast notification when a product is added
@@ -118,10 +130,12 @@ function showCartToast(productName) {
   toast.show();
 }
 
-// Add product into cart using product ID
+// Add product to cart using product id from allProducts
 function addProductToCart(productId) {
-  const product = allProducts.find((p) => p.id === productId);
+  // allProducts is loaded in script.js on index page
+  if (typeof allProducts === "undefined" || !Array.isArray(allProducts)) return;
 
+  const product = allProducts.find((p) => Number(p.id) === Number(productId));
   if (!product) return;
 
   if (cart[productId]) {
@@ -132,16 +146,38 @@ function addProductToCart(productId) {
 
   saveCart();
   renderCartItems();
-  showCartToast(product.name || "Product")
+  showCartToast(product.name || "Product");
 }
 
-// Update quantity
+// Optional reusable function for product details page
+function addProductObjectToCart(product, qty = 1) {
+  if (!product || !product.id) return;
+
+  const productId = Number(product.id);
+  const stockQty = Number(product.inventory?.quantity_on_hand || 0);
+  const currentQty = cart[productId]?.qty || 0;
+  const finalQty = currentQty + qty;
+
+  if (stockQty > 0 && finalQty > stockQty) return false;
+
+  if (cart[productId]) {
+    cart[productId].qty += qty;
+  } else {
+    cart[productId] = { product, qty };
+  }
+
+  saveCart();
+  renderCartItems();
+  showCartToast(product.name || "Product");
+  return true;
+}
+
+// Change item quantity
 function changeCartQty(productId, count) {
   if (!cart[productId]) return;
 
   cart[productId].qty += count;
 
-  // Prevent quantity above available inventory
   const maxStock = Number(cart[productId].product.inventory?.quantity_on_hand || 0);
   if (cart[productId].qty > maxStock) {
     cart[productId].qty = maxStock;
@@ -155,7 +191,7 @@ function changeCartQty(productId, count) {
   renderCartItems();
 }
 
-// Remove single item
+// Remove single cart item
 function removeCartItem(productId) {
   if (!cart[productId]) return;
 
@@ -171,9 +207,17 @@ function clearCart() {
   renderCartItems();
 }
 
-// Render cart items
+// ==============================
+// UI RENDER
+// ==============================
+
+// Render cart items into offcanvas
 function renderCartItems() {
-  if (!cartItemsContainer) return;
+  // If cart area does not exist on page, only update count/total safely
+  if (!cartItemsContainer) {
+    updateCartUI();
+    return;
+  }
 
   cartItemsContainer.innerHTML = "";
 
@@ -193,20 +237,29 @@ function renderCartItems() {
   }
 
   items.forEach(({ product, qty }) => {
+    if (!cartItemTemplate) return;
+
     const template = cartItemTemplate.content.cloneNode(true);
 
     const wrapper = template.querySelector(".item-delgetaion-id");
-    wrapper.dataset.cartId = product.id;
+    if (wrapper) wrapper.dataset.cartId = product.id;
 
     const img = template.querySelector("img");
-    img.src = product.image_url || "";
-    img.alt = product.name || "Product image";
+    if (img) {
+      img.src = product.image_url || "";
+      img.alt = product.name || "Product image";
+    }
 
-    template.querySelector(".item-name").textContent = product.name || "Untitled product";
-    template.querySelector(".item-meta").textContent =
-      `${product.category?.name || "Uncategorized"} · $${Number(product.price).toFixed(2)}`;
+    const nameEl = template.querySelector(".item-name");
+    if (nameEl) nameEl.textContent = product.name || "Untitled product";
 
-    template.querySelector(".item-qty").textContent = qty;
+    const metaEl = template.querySelector(".item-meta");
+    if (metaEl) {
+      metaEl.textContent = `${product.category?.name || "Uncategorized"} · $${Number(product.price).toFixed(2)}`;
+    }
+
+    const qtyEl = template.querySelector(".item-qty");
+    if (qtyEl) qtyEl.textContent = qty;
 
     cartItemsContainer.appendChild(template);
   });
@@ -214,16 +267,16 @@ function renderCartItems() {
   updateCartUI();
 }
 
-// Update total count + total price
+// Update total count and total price
 function updateCartUI() {
   if (cartCount) cartCount.textContent = cartCountTotal();
   if (cartTotal) cartTotal.textContent = cartPriceTotal().toFixed(2);
 }
 
-// Open detail page
+// Go to detail page
 function goToDetailPage(productId) {
-  window.location.href = `pages/product-details.html?id=${productId}`;
+  window.location.href = `product-details.html?id=${productId}`;
 }
 
-// Initial render
+// Initial cart render
 renderCartItems();

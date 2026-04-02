@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ({ product, qty }) => `
           <div class="d-flex align-items-center gap-3 border rounded p-2">
             <img
-              src="${product.image_url || ""}"
+              src="${product.image_url || "./assets/default.svg"}"
               alt="${product.name}"
               width="60"
               height="60"

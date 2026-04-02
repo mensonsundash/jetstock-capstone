@@ -10,6 +10,25 @@ body {
   color: var(--ink);
 }
 
+/* Navbar brand layout */
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Logo image inside navbar */
+.navbar-brand img {
+  width: 140px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+  border-radius: 8px;
+}
+
 .product-body{
     background: linear-gradient(180deg, rgba(13,110,253,0.08), rgba(25,135,84,0.06));
 }
@@ -59,4 +78,86 @@ body {
   padding: 8px 12px;
   font-weight: 600;
   backdrop-filter: blur(8px);
+}
+
+
+/* PRODUCT DETAILS PAGE */
+
+/* Main detail card rounded corners */
+.product-detail-card {
+  border-radius: 20px;
+}
+
+/* Large image wrapper background and spacing */
+.detail-image-wrap {
+  background: linear-gradient(180deg, #f8f9fa, #eef4ff);
+  border-radius: 18px;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* Main product image sizing */
+.detail-main-image {
+  max-height: 380px;
+  object-fit: contain;
+}
+
+/* Small info box for price, stock, SKU, supplier */
+.detail-info-box {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 16px;
+  padding: 14px 16px;
+  height: 100%;
+}
+
+/* Quantity controls group */
+.quantity-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Quantity input width and font */
+.quantity-box input {
+  width: 84px;
+  font-weight: 600;
+}
+
+/* Circle icon background used in lower info cards */
+.detail-icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(13, 110, 253, 0.12);
+  color: #0d6efd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .detail-image-wrap {
+    min-height: 280px;
+  }
+
+  .detail-main-image {
+    max-height: 240px;
+  }
+}
+
+/* Slightly smaller logo on mobile */
+@media (max-width: 576px) {
+  .navbar-brand img {
+    width: 50px;
+  }
+
+  .navbar-brand span {
+    font-size: 1rem;
+  }
 }
