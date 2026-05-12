@@ -3,6 +3,13 @@ node_modules/
 
 #environment files
 .env
+server/.env
+client/.env
+
+#distribution build files
+dist
+build
+.DS_Store
 
 #react files
 .vite
