@@ -1,0 +1,57 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: jetstock_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: jetstock
+      MYSQL_USER: jetstock_user
+      MYSQL_PASSWORD: jetstock_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+  backend:
+    build: ./server
+    container_name: jetstock_backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./client
+    container_name: jetstock_frontend
+    restart: always
+    ports:
+      - "3001:80"
+
+  storefront:
+    build: ./storefront
+    container_name: jetstock_storefront
+    restart: always
+    ports:
+      - "3002:80"
+
+  nginx:
+    image: nginx:alpine
+    container_name: jetstock_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - frontend
+      - storefront
+      - backend
+
+
+volumes:
+  mysql_data:
