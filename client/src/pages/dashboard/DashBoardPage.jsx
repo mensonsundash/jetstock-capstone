@@ -14,7 +14,6 @@ import { getAllStockMovements } from "../../api/stockMovementApi";
 import Loader from "../../components/common/Loader";
 import DashboardCard from "../../components/layout/DashboardCard";
 
-
 // Dashboard page
 //using useEffect to fetch backend data when page loads
 // displays summary cards, low stock items, recent stocko movements
