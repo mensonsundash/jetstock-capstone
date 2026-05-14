@@ -29,6 +29,8 @@ services:
     restart: always
     ports:
       - "3001:80"
+    depends_on: 
+      - backend
 
   storefront:
     build: ./jet-store
@@ -36,20 +38,8 @@ services:
     restart: always
     ports:
       - "3002:80"
-
-  nginx:
-    image: nginx:alpine
-    container_name: jetstock_nginx
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - frontend
-      - storefront
       - backend
-
 
 volumes:
   mysql_data:
