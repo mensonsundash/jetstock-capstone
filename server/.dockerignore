@@ -1,4 +1,7 @@
 node_modules
-.git
-coverage
 .env
+.env.example
+npm-debug.log
+tests
+jest.config.js
+.git
