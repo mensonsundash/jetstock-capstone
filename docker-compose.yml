@@ -1,21 +1,21 @@
 services:
   mysql:
-    image: mysql:8
-    container_name: jetstock_mysql
-    restart: always
+    image: mysql:8.0
+    container_name: jetstock-mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: jetstock
       MYSQL_USER: jetstock_user
       MYSQL_PASSWORD: jetstock_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
   backend:
     build: ./server
-    container_name: jetstock_backend
-    restart: always
+    container_name: jetstock-backend
+    restart: unless-stopped
     ports:
       - "3000:3000"
     env_file:
@@ -23,10 +23,13 @@ services:
     depends_on:
       - mysql
 
-  frontend:
-    build: ./client
-    container_name: jetstock_frontend
-    restart: always
+  client:
+    build: 
+      context: ./client
+      args:
+        VITE_API_URL: http://localhost:3000/api/v1
+    container_name: jetstock-client
+    restart: unless-stopped
     ports:
       - "3001:80"
     depends_on: 
@@ -34,8 +37,8 @@ services:
 
   storefront:
     build: ./jet-store
-    container_name: jetstock_storefront
-    restart: always
+    container_name: jetstock-storefront
+    restart: unless-stopped
     ports:
       - "3002:80"
     depends_on:
